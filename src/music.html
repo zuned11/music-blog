@@ -1,0 +1,87 @@
+---
+layout: base
+title: Music
+description: Original compositions and music releases with high-quality audio
+---
+
+<div class="page-header">
+    <h1>Music</h1>
+    <p>Original compositions and music releases with high-quality audio</p>
+</div>
+
+<div class="music-list">
+    {% for track in collections.music %}
+    <article class="music-card">
+        <div class="music-card-header">
+            <h2 class="music-card-title">
+                <a href="{{ track.url }}">{{ track.data.title }}</a>
+            </h2>
+            <div class="music-meta">
+                <span class="artist">{{ track.data.artist }}</span>
+                {% if track.data.album and track.data.album != "Unknown Album" %}
+                <span class="album">from <em>{{ track.data.album }}</em></span>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="music-preview">
+            {% if track.data.filename %}
+            <div class="music-player-inline">
+                <audio controls preload="metadata">
+                    <source src="/music-files/{{ track.data.filename }}" type="audio/flac">
+                    <p>Your browser doesn't support HTML5 audio.</p>
+                </audio>
+            </div>
+            {% endif %}
+            
+            <div class="music-info-inline">
+                {% if track.data.duration %}
+                <span class="duration">{{ track.data.duration | formatDuration }}</span>
+                {% endif %}
+                {% if track.data.genre %}
+                <div class="genre-tags">
+                    {% for genre in track.data.genre %}
+                    <span class="genre-tag">{{ genre }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        {% if track.data.description %}
+        <p class="music-description">{{ track.data.description | truncate: 150 }}</p>
+        {% endif %}
+        
+        <div class="music-card-actions">
+            <a href="{{ track.url }}" class="view-details">View Details →</a>
+            {% if track.data.filename %}
+            <a href="/music-files/{{ track.data.filename }}" class="download-link" download>
+                Download FLAC
+                {% if track.data.fileSize %}
+                ({{ track.data.fileSize | formatFileSize }})
+                {% endif %}
+            </a>
+            {% endif %}
+        </div>
+        
+        <div class="release-date">
+            <time datetime="{{ track.data.date }}">{{ track.data.date }}</time>
+        </div>
+    </article>
+    {% endfor %}
+</div>
+
+{% if collections.music.length == 0 %}
+<div class="empty-state">
+    <h2>No music releases yet</h2>
+    <p>Check back soon for original compositions and audio releases!</p>
+    <div class="upload-hint">
+        <p><strong>To add music:</strong></p>
+        <ol>
+            <li>Add FLAC files to the <code>music-files/</code> directory</li>
+            <li>Run <code>npm run extract-music</code> to generate pages</li>
+            <li>Edit the generated markdown files to add descriptions</li>
+        </ol>
+    </div>
+</div>
+{% endif %}

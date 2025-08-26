@@ -1,0 +1,45 @@
+---
+layout: base
+title: Blog
+description: Music reviews, technical posts, and industry insights
+---
+
+<div class="page-header">
+    <h1>Blog</h1>
+    <p>Music reviews, technical posts, and industry insights</p>
+</div>
+
+<div class="post-list">
+    {% for post in collections.blog %}
+    <article class="post-card">
+        <h2 class="post-card-title">
+            <a href="{{ post.url }}">{{ post.data.title }}</a>
+        </h2>
+        <div class="post-meta">
+            <time datetime="{{ post.date | htmlDateString }}">
+                {{ post.date | readableDate }}
+            </time>
+            {% if post.data.tags %}
+            <div class="post-tags">
+                {% for tag in post.data.tags %}
+                {% if tag != "blog" %}
+                <span class="tag">{{ tag }}</span>
+                {% endif %}
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+        {% if post.data.description %}
+        <p class="post-excerpt">{{ post.data.description }}</p>
+        {% endif %}
+        <a href="{{ post.url }}" class="read-more">Read more →</a>
+    </article>
+    {% endfor %}
+</div>
+
+{% if collections.blog.length == 0 %}
+<div class="empty-state">
+    <h2>No blog posts yet</h2>
+    <p>Check back soon for music reviews, technical articles, and industry insights!</p>
+</div>
+{% endif %}
