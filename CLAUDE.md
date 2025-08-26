@@ -192,3 +192,5 @@ A static site generator-based music blog and portfolio built with 11ty (Eleventy
 This music blog project successfully implements a robust, secure, and performant static site generation workflow with unique features for music content management. The architecture provides a solid foundation for both personal use and potential scaling to a larger music community platform.
 
 The combination of modern web technologies, comprehensive deployment automation, and thoughtful content management creates a sustainable platform for long-term music blogging and portfolio showcase needs.
+
+- Whenever an update is complete, run the scripts to rebuild and redeploy locally so that I can remote into the server to view them.
