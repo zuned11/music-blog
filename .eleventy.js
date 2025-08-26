@@ -2,8 +2,12 @@ const { DateTime } = require("luxon");
 const markdownIt = require("markdown-it");
 const markdownItAnchor = require("markdown-it-anchor");
 const yaml = require("yaml");
+const rssPlugin = require("@11ty/eleventy-plugin-rss");
 
 module.exports = function(eleventyConfig) {
+  
+  // Add RSS plugin
+  eleventyConfig.addPlugin(rssPlugin);
   
   // Copy static assets
   eleventyConfig.addPassthroughCopy("src/assets");
@@ -33,6 +37,18 @@ module.exports = function(eleventyConfig) {
     if (!bytes) return "Unknown";
     const mb = bytes / (1024 * 1024);
     return `${mb.toFixed(1)} MB`;
+  });
+  
+  // Text truncation filter
+  eleventyConfig.addFilter("truncate", (str, length = 150) => {
+    if (!str) return "";
+    if (str.length <= length) return str;
+    return str.substring(0, length).trim() + "...";
+  });
+  
+  // Absolute URL filter for RSS feeds
+  eleventyConfig.addFilter("absoluteUrl", (url, base) => {
+    return new URL(url, base).href;
   });
   
   // Collections
