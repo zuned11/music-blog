@@ -3,6 +3,7 @@ title: "Welcome to My Music Blog"
 date: 2024-08-26
 tags: ["blog", "music", "introduction"]
 description: "An introduction to my music blog and what you can expect to find here."
+layout: base
 ---
 
 # Welcome to My Music Blog

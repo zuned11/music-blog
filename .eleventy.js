@@ -27,7 +27,7 @@ module.exports = function(eleventyConfig) {
   
   // Music-specific filters
   eleventyConfig.addFilter("formatDuration", duration => {
-    if (!duration) return "Unknown";
+    if (duration === null || duration === undefined || duration === "") return "Unknown";
     const minutes = Math.floor(duration / 60);
     const seconds = Math.floor(duration % 60);
     return `${minutes}:${seconds.toString().padStart(2, '0')}`;
@@ -86,12 +86,12 @@ module.exports = function(eleventyConfig) {
       "md",
       "html"
     ],
-    markdownTemplateEngine: "html",
-    htmlTemplateEngine: "html",
+    markdownTemplateEngine: "njk",
+    htmlTemplateEngine: "njk",
     dir: {
       input: "src",
-      includes: "includes", 
-      data: "data",
+      includes: "_includes", 
+      data: "_data",
       output: "public"
     }
   };
