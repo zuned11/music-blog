@@ -1,0 +1,26 @@
+{
+  "name": "music-blog",
+  "version": "1.0.0",
+  "description": "Personal music blog and portfolio built with 11ty",
+  "main": "index.js",
+  "scripts": {
+    "build": "eleventy --quiet",
+    "build:watch": "eleventy --watch --serve --quiet",
+    "start": "eleventy --serve --quiet",
+    "clean": "rm -rf public",
+    "dev": "npm run clean && eleventy --serve --watch --quiet"
+  },
+  "keywords": ["11ty", "blog", "music", "static-site"],
+  "author": "zuned11",
+  "license": "MIT",
+  "devDependencies": {
+    "@11ty/eleventy": "^2.0.1",
+    "@11ty/eleventy-plugin-rss": "^1.2.0",
+    "luxon": "^3.4.4",
+    "markdown-it": "^14.0.0",
+    "markdown-it-anchor": "^8.6.7"
+  },
+  "dependencies": {
+    "yaml": "^2.3.4"
+  }
+}
