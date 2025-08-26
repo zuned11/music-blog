@@ -1,6 +1,6 @@
 # Music Blog - Claude Code Project
 
-This document provides comprehensive information about the music blog project architecture, current state, and future improvement opportunities.
+This document provides comprehensive information about the music blog project architecture, current state, and future improvement opportunities. When there are multiple options forward, ask questions and provide options rather than proceeding uninterrupted. Focus the questions mostly on high level concepts. 
 
 ## Project Overview
 

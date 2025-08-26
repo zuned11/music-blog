@@ -181,13 +181,13 @@ describe('Eleventy Configuration', () => {
       const config = eleventyConfig(mockEleventyConfig);
       
       expect(config).toEqual({
-        templateFormats: ['md', 'html'],
-        markdownTemplateEngine: 'html',
-        htmlTemplateEngine: 'html',
+        templateFormats: ['md', 'njk', 'html'],
+        markdownTemplateEngine: 'njk',
+        htmlTemplateEngine: 'njk',
         dir: {
           input: 'src',
-          includes: 'includes',
-          data: 'data',
+          includes: '_includes',
+          data: '_data',
           output: 'public'
         }
       });

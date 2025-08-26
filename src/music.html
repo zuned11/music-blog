@@ -49,7 +49,7 @@ description: Original compositions and music releases with high-quality audio
         </div>
         
         {% if track.data.description %}
-        <p class="music-description">{{ track.data.description | truncate: 150 }}</p>
+        <p class="music-description">{{ track.data.description | truncate(150) }}</p>
         {% endif %}
         
         <div class="music-card-actions">

@@ -1,6 +1,7 @@
 const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
+const EleventyClass = require('@11ty/eleventy');
 
 describe('Build Process Integration', () => {
   const testOutputDir = path.join(__dirname, '../fixtures/test-output');
@@ -21,74 +22,75 @@ describe('Build Process Integration', () => {
 
   beforeEach(() => {
     // Clean output directory before each test
-    if (fs.existsSync('public')) {
-      fs.rmSync('public', { recursive: true, force: true });
+    const publicPath = path.join(process.cwd(), 'public');
+    if (fs.existsSync(publicPath)) {
+      fs.rmSync(publicPath, { recursive: true, force: true });
     }
   });
 
   describe('Eleventy Build', () => {
-    it('should build site successfully', () => {
-      expect(() => {
-        execSync('npm run build', { 
-          stdio: 'pipe',
-          timeout: 30000 
-        });
-      }).not.toThrow();
+    it('should build site successfully', async () => {
+      const publicPath = path.join(process.cwd(), 'public');
+      
+      // Use Eleventy programmatically
+      const elv = new EleventyClass('src', 'public');
+      await elv.write();
       
       // Check that public directory was created
-      expect(fs.existsSync('public')).toBe(true);
-    });
+      expect(fs.existsSync(publicPath)).toBe(true);
+    }, 30000);
 
-    it('should generate index.html', () => {
-      execSync('npm run build', { stdio: 'pipe' });
+    it('should generate index.html', async () => {
+      const elv = new EleventyClass('src', 'public');
+      await elv.write();
       
-      const indexPath = path.join('public', 'index.html');
+      const indexPath = path.join(process.cwd(), 'public', 'index.html');
       expect(fs.existsSync(indexPath)).toBe(true);
       
       const content = fs.readFileSync(indexPath, 'utf-8');
       expect(content).toContain('<!DOCTYPE html>');
       expect(content).toContain('Welcome to My Music Blog');
-    });
+    }, 30000);
 
     it('should copy static assets', () => {
-      execSync('npm run build', { stdio: 'pipe' });
+      execSync('npm run build', { stdio: 'pipe', cwd: process.cwd() });
       
       // Check CSS file
-      const cssPath = path.join('public', 'assets', 'css', 'main.css');
+      const cssPath = path.join(process.cwd(), 'public', 'assets', 'css', 'main.css');
       expect(fs.existsSync(cssPath)).toBe(true);
       
       // Check JS file
-      const jsPath = path.join('public', 'assets', 'js', 'main.js');
+      const jsPath = path.join(process.cwd(), 'public', 'assets', 'js', 'main.js');
       expect(fs.existsSync(jsPath)).toBe(true);
     });
 
     it('should generate blog pages', () => {
-      execSync('npm run build', { stdio: 'pipe' });
+      execSync('npm run build', { stdio: 'pipe', cwd: process.cwd() });
       
-      const blogIndexPath = path.join('public', 'blog', 'index.html');
+      const blogIndexPath = path.join(process.cwd(), 'public', 'blog', 'index.html');
       expect(fs.existsSync(blogIndexPath)).toBe(true);
       
       // Check if example post was built
-      const examplePostPath = path.join('public', 'content', 'blog', 'example-post', 'index.html');
+      const examplePostPath = path.join(process.cwd(), 'public', 'content', 'blog', 'example-post', 'index.html');
       expect(fs.existsSync(examplePostPath)).toBe(true);
     });
 
     it('should generate music pages', () => {
-      execSync('npm run build', { stdio: 'pipe' });
+      execSync('npm run build', { stdio: 'pipe', cwd: process.cwd() });
       
-      const musicIndexPath = path.join('public', 'music', 'index.html');
+      const musicIndexPath = path.join(process.cwd(), 'public', 'music', 'index.html');
       expect(fs.existsSync(musicIndexPath)).toBe(true);
     });
 
     it('should generate RSS feeds', () => {
-      execSync('npm run build', { stdio: 'pipe' });
+      execSync('npm run build', { stdio: 'pipe', cwd: process.cwd() });
       
       // Check blog RSS feed
-      const blogFeedPath = path.join('public', 'feed.xml');
+      const blogFeedPath = path.join(process.cwd(), 'public', 'feed.xml');
       expect(fs.existsSync(blogFeedPath)).toBe(true);
       
       // Check music RSS feed
-      const musicFeedPath = path.join('public', 'music-feed.xml');
+      const musicFeedPath = path.join(process.cwd(), 'public', 'music-feed.xml');
       expect(fs.existsSync(musicFeedPath)).toBe(true);
       
       // Verify RSS content structure
@@ -100,9 +102,9 @@ describe('Build Process Integration', () => {
 
   describe('Content Processing', () => {
     it('should process markdown correctly', () => {
-      execSync('npm run build', { stdio: 'pipe' });
+      execSync('npm run build', { stdio: 'pipe', cwd: process.cwd() });
       
-      const examplePostPath = path.join('public', 'content', 'blog', 'example-post', 'index.html');
+      const examplePostPath = path.join(process.cwd(), 'public', 'content', 'blog', 'example-post', 'index.html');
       const content = fs.readFileSync(examplePostPath, 'utf-8');
       
       // Check that markdown was converted to HTML
@@ -112,9 +114,9 @@ describe('Build Process Integration', () => {
     });
 
     it('should apply layouts correctly', () => {
-      execSync('npm run build', { stdio: 'pipe' });
+      execSync('npm run build', { stdio: 'pipe', cwd: process.cwd() });
       
-      const indexPath = path.join('public', 'index.html');
+      const indexPath = path.join(process.cwd(), 'public', 'index.html');
       const content = fs.readFileSync(indexPath, 'utf-8');
       
       // Check for base layout elements
@@ -125,9 +127,9 @@ describe('Build Process Integration', () => {
     });
 
     it('should handle frontmatter data', () => {
-      execSync('npm run build', { stdio: 'pipe' });
+      execSync('npm run build', { stdio: 'pipe', cwd: process.cwd() });
       
-      const examplePostPath = path.join('public', 'content', 'blog', 'example-post', 'index.html');
+      const examplePostPath = path.join(process.cwd(), 'public', 'content', 'blog', 'example-post', 'index.html');
       const content = fs.readFileSync(examplePostPath, 'utf-8');
       
       // Check that frontmatter data is used
@@ -139,7 +141,7 @@ describe('Build Process Integration', () => {
     it('should build within reasonable time', () => {
       const startTime = Date.now();
       
-      execSync('npm run build', { stdio: 'pipe' });
+      execSync('npm run build', { stdio: 'pipe', cwd: process.cwd() });
       
       const buildTime = Date.now() - startTime;
       
@@ -170,19 +172,21 @@ describe('Build Process Integration', () => {
     it('should clean previous build', () => {
       // Create a test file in public
       fs.mkdirSync('public', { recursive: true });
-      fs.writeFileSync(path.join('public', 'test-file.txt'), 'test');
+      fs.writeFileSync(path.join(process.cwd(), 'public', 'test-file.txt'), 'test');
       
-      execSync('npm run clean', { stdio: 'pipe' });
+      execSync('npm run clean', { stdio: 'pipe', cwd: process.cwd() });
       
-      expect(fs.existsSync('public')).toBe(false);
+      const publicPath = path.join(process.cwd(), 'public');
+      expect(fs.existsSync(publicPath)).toBe(false);
     });
 
     it('should rebuild cleanly after clean', () => {
-      execSync('npm run clean', { stdio: 'pipe' });
-      execSync('npm run build', { stdio: 'pipe' });
+      execSync('npm run clean', { stdio: 'pipe', cwd: process.cwd() });
+      execSync('npm run build', { stdio: 'pipe', cwd: process.cwd() });
       
-      expect(fs.existsSync('public')).toBe(true);
-      expect(fs.existsSync(path.join('public', 'index.html'))).toBe(true);
+      const publicPath = path.join(process.cwd(), 'public');
+      expect(fs.existsSync(publicPath)).toBe(true);
+      expect(fs.existsSync(path.join(process.cwd(), 'public', 'index.html'))).toBe(true);
     });
   });
 });
