@@ -169,6 +169,247 @@ a:hover {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
+/* Page Header Styles */
+.page-header {
+    margin-bottom: 3rem;
+    text-align: center;
+    padding-bottom: 2rem;
+    border-bottom: 2px solid #ecf0f1;
+}
+
+.page-header h1 {
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+}
+
+.page-header p {
+    color: #7f8c8d;
+    font-size: 1.1rem;
+    margin: 0;
+}
+
+/* Music Card Styles */
+.music-list {
+    display: grid;
+    gap: 2rem;
+}
+
+.music-card {
+    border: 1px solid #ecf0f1;
+    border-radius: 8px;
+    padding: 1.5rem;
+    transition: box-shadow 0.3s ease, transform 0.2s ease;
+}
+
+.music-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+.music-card-header {
+    margin-bottom: 1rem;
+}
+
+.music-card-title {
+    margin: 0 0 0.5rem 0;
+}
+
+.music-card-title a {
+    color: #2c3e50;
+    text-decoration: none;
+}
+
+.music-card-title a:hover {
+    color: #3498db;
+}
+
+.music-meta {
+    color: #7f8c8d;
+    font-size: 0.9rem;
+}
+
+.music-meta .artist {
+    font-weight: 500;
+}
+
+.music-preview {
+    margin: 1rem 0;
+    background-color: #f8f9fa;
+    padding: 1rem;
+    border-radius: 6px;
+}
+
+.music-player-inline {
+    margin-bottom: 1rem;
+}
+
+.music-player-inline audio {
+    width: 100%;
+}
+
+.music-info-inline {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.duration {
+    font-weight: 500;
+    color: #2c3e50;
+}
+
+.genre-tags {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.genre-tag {
+    background-color: #3498db;
+    color: white;
+    padding: 0.2rem 0.5rem;
+    border-radius: 3px;
+    font-size: 0.8rem;
+}
+
+.music-description {
+    color: #666;
+    margin: 1rem 0;
+    line-height: 1.6;
+}
+
+.music-card-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #ecf0f1;
+}
+
+.view-details {
+    color: #3498db;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.view-details:hover {
+    text-decoration: underline;
+}
+
+.release-date {
+    color: #7f8c8d;
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+}
+
+/* Music Layout Specific Styles */
+.music-metadata {
+    background-color: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin: 2rem 0;
+}
+
+.music-metadata h3 {
+    color: #2c3e50;
+    margin-bottom: 1rem;
+}
+
+.technical-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.music-credits {
+    background-color: #ecf0f1;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin: 2rem 0;
+}
+
+.music-credits h3 {
+    color: #2c3e50;
+    margin-bottom: 1rem;
+}
+
+/* Tag Styles */
+.post-tags {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-top: 0.5rem;
+}
+
+.tag {
+    background-color: #ecf0f1;
+    color: #2c3e50;
+    padding: 0.2rem 0.5rem;
+    border-radius: 3px;
+    font-size: 0.8rem;
+}
+
+/* Empty State Styles */
+.empty-state {
+    text-align: center;
+    padding: 3rem 2rem;
+    color: #7f8c8d;
+}
+
+.empty-state h2 {
+    color: #2c3e50;
+    margin-bottom: 1rem;
+}
+
+.upload-hint {
+    background-color: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-top: 2rem;
+    text-align: left;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.upload-hint p {
+    margin-bottom: 1rem;
+    color: #2c3e50;
+}
+
+.upload-hint ol {
+    color: #666;
+    padding-left: 1.5rem;
+}
+
+.upload-hint li {
+    margin-bottom: 0.5rem;
+}
+
+.upload-hint code {
+    background-color: #e9ecef;
+    padding: 0.2rem 0.4rem;
+    border-radius: 3px;
+    font-size: 0.9rem;
+}
+
+/* Read More Link */
+.read-more {
+    color: #3498db;
+    text-decoration: none;
+    font-weight: 500;
+    margin-top: 1rem;
+    display: inline-block;
+}
+
+.read-more:hover {
+    text-decoration: underline;
+}
+
 /* Footer */
 .footer {
     background-color: #34495e;
