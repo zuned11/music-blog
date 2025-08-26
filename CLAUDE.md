@@ -46,10 +46,14 @@ A static site generator-based music blog and portfolio built with 11ty (Eleventy
 - **Root Perms**: You will be running as root. The user that should be used for serving the site is named 'blog' and does not have sudo permissions for security reasons.
 - **Opt for simple solutions**: bash scripts are a useful utility, and do not need to be overengineered.
 
+
 ### Repository Instructions
 - **Master Branch**: Not to be committed to, only merged into from other branches.
 - **Branch per Task**: Make sure work on a new task is started on another branch. Checkout Master, create a new branch, and commit work early and often. When a task for a feature is completed, merge it into master.
 - **Small Atomic Features**: Make sure branches and merges are minimal in size to ensure commits are not overwhelming and changes can be isolated in case of breaking changes.
+- **Rebuild After Changes**: After a successful git merge into the master branch, run what is needed to regenerate the static site so that I can monitor changes periodically. Inform me of rebuilds.
+- **Testing**: Include tests for new features. Run these tests after building a feature to ensure the feature is implemented correctly, and return to the feature's branch if a failure is encountered to fix said error.
+
 ## Current Objectives
 
 ### Core Features ✅
