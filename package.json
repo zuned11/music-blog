@@ -8,7 +8,9 @@
     "build:watch": "eleventy --watch --serve --quiet",
     "start": "eleventy --serve --quiet",
     "clean": "rm -rf public",
-    "dev": "npm run clean && eleventy --serve --watch --quiet"
+    "dev": "npm run clean && eleventy --serve --watch --quiet",
+    "extract-music": "node scripts/extract-metadata.js music-files/",
+    "extract-single": "node scripts/extract-metadata.js"
   },
   "keywords": ["11ty", "blog", "music", "static-site"],
   "author": "zuned11",

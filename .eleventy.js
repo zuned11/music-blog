@@ -68,15 +68,13 @@ module.exports = function(eleventyConfig) {
   return {
     templateFormats: [
       "md",
-      "njk",
-      "html",
-      "liquid"
+      "html"
     ],
-    markdownTemplateEngine: "njk",
-    htmlTemplateEngine: "njk",
+    markdownTemplateEngine: "html",
+    htmlTemplateEngine: "html",
     dir: {
       input: "src",
-      includes: "includes",
+      includes: "includes", 
       data: "data",
       output: "public"
     }

@@ -1,0 +1,56 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build output
+public/
+dist/
+
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Music files (too large for git)
+music-files/*.flac
+music-files/*.wav
+music-files/*.mp3
+
+# Keep music-files directory structure but ignore audio files
+!music-files/.gitkeep
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+logs/
+*.log
+
+# Runtime files
+pids/
+*.pid
+*.seed
+
+# Coverage
+coverage/
+
+# Cache
+.cache/
+.tmp/
+.temp/
