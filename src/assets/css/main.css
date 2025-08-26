@@ -419,6 +419,187 @@ a:hover {
     margin-top: 4rem;
 }
 
+/* Homepage Layout */
+.homepage-layout {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 3rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.content-feed {
+    min-width: 0; /* Prevents grid overflow */
+}
+
+.page-intro {
+    margin-bottom: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 2px solid #ecf0f1;
+}
+
+.page-intro h1 {
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+}
+
+.page-intro p {
+    color: #7f8c8d;
+    font-size: 1.1rem;
+    margin: 0;
+}
+
+.blog-feed h2 {
+    color: #2c3e50;
+    margin-bottom: 1.5rem;
+    font-size: 1.8rem;
+}
+
+/* Sidebar Styles */
+.sidebar {
+    background-color: #f8f9fa;
+    padding: 2rem;
+    border-radius: 8px;
+    height: fit-content;
+    position: sticky;
+    top: 2rem;
+}
+
+.sidebar-section {
+    margin-bottom: 2.5rem;
+}
+
+.sidebar-section:last-child {
+    margin-bottom: 0;
+}
+
+.sidebar-section h3 {
+    color: #2c3e50;
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+    border-bottom: 2px solid #3498db;
+    padding-bottom: 0.5rem;
+}
+
+/* Music Mini Cards */
+.music-mini-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    margin-bottom: 1rem;
+}
+
+.music-mini-card {
+    padding: 0.8rem;
+    background-color: white;
+    border-radius: 6px;
+    border-left: 3px solid #27ae60;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.music-mini-card:hover {
+    transform: translateX(2px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.music-mini-card h4 {
+    margin: 0 0 0.3rem 0;
+    font-size: 0.9rem;
+}
+
+.music-mini-card h4 a {
+    color: #2c3e50;
+    text-decoration: none;
+}
+
+.music-mini-card h4 a:hover {
+    color: #27ae60;
+}
+
+.music-mini-meta {
+    color: #7f8c8d;
+    font-size: 0.8rem;
+    margin: 0;
+}
+
+/* Blog Mini Cards */
+.blog-mini-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    margin-bottom: 1rem;
+}
+
+.blog-mini-card {
+    padding: 0.8rem;
+    background-color: white;
+    border-radius: 6px;
+    border-left: 3px solid #3498db;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.blog-mini-card:hover {
+    transform: translateX(2px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.blog-mini-card h4 {
+    margin: 0 0 0.3rem 0;
+    font-size: 0.9rem;
+}
+
+.blog-mini-card h4 a {
+    color: #2c3e50;
+    text-decoration: none;
+}
+
+.blog-mini-card h4 a:hover {
+    color: #3498db;
+}
+
+.blog-mini-meta {
+    color: #7f8c8d;
+    font-size: 0.8rem;
+    margin: 0;
+}
+
+/* View All Links */
+.view-all-link {
+    color: #3498db;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.9rem;
+    display: inline-block;
+    transition: color 0.3s ease;
+}
+
+.view-all-link:hover {
+    color: #2980b9;
+    text-decoration: underline;
+}
+
+/* Enhanced Post Cards for Homepage */
+.blog-feed .post-card {
+    margin-bottom: 2rem;
+}
+
+.blog-feed .post-card:last-child {
+    margin-bottom: 0;
+}
+
+.blog-feed .post-card h3 {
+    margin-bottom: 0.5rem;
+}
+
+.blog-feed .post-card .post-meta {
+    margin-bottom: 1rem;
+}
+
+.blog-feed .post-card p {
+    line-height: 1.6;
+    color: #666;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .nav {
@@ -432,6 +613,25 @@ a:hover {
     
     .main {
         padding: 1rem;
+    }
+    
+    .homepage-layout {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+    
+    .sidebar {
+        position: static;
+        order: -1; /* Show sidebar above content on mobile */
+        padding: 1.5rem;
+    }
+    
+    .sidebar-section {
+        margin-bottom: 1.5rem;
+    }
+    
+    .sidebar-section h3 {
+        font-size: 1rem;
     }
     
     h1 { font-size: 2rem; }

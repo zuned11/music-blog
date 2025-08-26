@@ -38,12 +38,18 @@ A static site generator-based music blog and portfolio built with 11ty (Eleventy
 - **File Storage**: Static file serving for audio content
 - **Monitoring**: Basic access logging and uptime monitoring
 
-### Development Environment
+### Development Environment:
 - **Platform**: Raspberry Pi 5 (8GB RAM) running Raspbian
 - **Package Management**: npm for JavaScript dependencies
 - **Version Control**: Git with feature branch workflow
 - **Content Creation**: Obsidian → Markdown workflow
+- **Root Perms**: You will be running as root. The user that should be used for serving the site is named 'blog' and does not have sudo permissions for security reasons.
+- **Opt for simple solutions**: bash scripts are a useful utility, and do not need to be overengineered.
 
+### Repository Instructions
+- **Master Branch**: Not to be committed to, only merged into from other branches.
+- **Branch per Task**: Make sure work on a new task is started on another branch. Checkout Master, create a new branch, and commit work early and often. When a task for a feature is completed, merge it into master.
+- **Small Atomic Features**: Make sure branches and merges are minimal in size to ensure commits are not overwhelming and changes can be isolated in case of breaking changes.
 ## Current Objectives
 
 ### Core Features ✅

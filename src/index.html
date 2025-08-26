@@ -20,31 +20,91 @@
     </header>
 
     <main class="main">
-        <div class="content">
-            <h1>Welcome to My Music Blog</h1>
-            <p>This is a personal music blog and portfolio showcasing original compositions and thoughts about music.</p>
+        <div class="homepage-layout">
+            <!-- Main Content Area - Blog Feed -->
+            <div class="content-feed">
+                <header class="page-intro">
+                    <h1>Welcome to My Music Blog</h1>
+                    <p>Personal music blog and portfolio showcasing original compositions and thoughts about music.</p>
+                </header>
+                
+                <section class="blog-feed">
+                    <h2>Latest Blog Posts</h2>
+                    <div class="post-list">
+                        <article class="post-card">
+                            <h3><a href="/blog/example-post/">Welcome to My Music Blog</a></h3>
+                            <p class="post-meta">August 26, 2024</p>
+                            <p>An introduction to my music blog and what you can expect to find here. This blog will feature music reviews, personal projects, technical posts, and industry insights.</p>
+                            <a href="/blog/example-post/" class="read-more">Read more →</a>
+                        </article>
+                        
+                        <!-- Placeholder for more posts -->
+                        <article class="post-card">
+                            <h3><a href="#">Music Production Tips</a></h3>
+                            <p class="post-meta">Coming soon...</p>
+                            <p>Deep dive into audio engineering techniques and production workflows.</p>
+                            <a href="#" class="read-more">Read more →</a>
+                        </article>
+                        
+                        <article class="post-card">
+                            <h3><a href="#">Album Review: Latest Discovery</a></h3>
+                            <p class="post-meta">Coming soon...</p>
+                            <p>Exploring new releases and hidden gems in electronic music.</p>
+                            <a href="#" class="read-more">Read more →</a>
+                        </article>
+                    </div>
+                </section>
+            </div>
             
-            <section class="recent-posts">
-                <h2>Recent Posts</h2>
-                <div class="post-list">
-                    <article class="post-card">
-                        <h3><a href="/blog/example-post/">Welcome Post</a></h3>
-                        <p class="post-meta">August 26, 2024</p>
-                        <p>An introduction to this music blog and what you can expect to find here.</p>
-                    </article>
-                </div>
-            </section>
-            
-            <section class="recent-music">
-                <h2>Latest Music</h2>
-                <div class="post-list">
-                    <article class="post-card">
-                        <h3><a href="/music/example-track/">Latest Track</a></h3>
-                        <p class="post-meta">Electronic • 4:47</p>
-                        <p>A new electronic composition exploring ambient soundscapes.</p>
-                    </article>
-                </div>
-            </section>
+            <!-- Sidebar - Table of Contents -->
+            <aside class="sidebar">
+                <section class="sidebar-section">
+                    <h3>🎵 Newest Song Releases</h3>
+                    <div class="music-mini-list">
+                        <article class="music-mini-card">
+                            <h4><a href="/music/example-track/">Latest Track</a></h4>
+                            <p class="music-mini-meta">Electronic • 4:47</p>
+                        </article>
+                        
+                        <article class="music-mini-card">
+                            <h4><a href="#">Ambient Experiment</a></h4>
+                            <p class="music-mini-meta">Ambient • 6:12</p>
+                        </article>
+                        
+                        <article class="music-mini-card">
+                            <h4><a href="#">Synthwave Journey</a></h4>
+                            <p class="music-mini-meta">Synthwave • 5:33</p>
+                        </article>
+                    </div>
+                    <a href="/music/" class="view-all-link">View all music →</a>
+                </section>
+                
+                <section class="sidebar-section">
+                    <h3>📝 All Blog Entries</h3>
+                    <div class="blog-mini-list">
+                        <article class="blog-mini-card">
+                            <h4><a href="/blog/example-post/">Welcome to My Music Blog</a></h4>
+                            <p class="blog-mini-meta">Aug 26, 2024</p>
+                        </article>
+                        
+                        <article class="blog-mini-card">
+                            <h4><a href="#">Music Production Tips</a></h4>
+                            <p class="blog-mini-meta">Coming soon</p>
+                        </article>
+                        
+                        <article class="blog-mini-card">
+                            <h4><a href="#">Album Review: Latest Discovery</a></h4>
+                            <p class="blog-mini-meta">Coming soon</p>
+                        </article>
+                        
+                        <article class="blog-mini-card">
+                            <h4><a href="#">Industry Insights</a></h4>
+                            <p class="blog-mini-meta">Coming soon</p>
+                        </article>
+                    </div>
+                    <a href="/blog/" class="view-all-link">View all posts →</a>
+                </section>
+            </aside>
         </div>
     </main>
 
