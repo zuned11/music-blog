@@ -113,6 +113,17 @@
             <h2 class="sidebar-brand">zuned11.blog</h2>
         </div>
         
+        <!-- Search Section -->
+        <section id="sidebar-search" class="sidebar-section sidebar-search-section">
+            <h3 class="sidebar-section-title">Search</h3>
+            <div class="search-container">
+                <input type="text" id="search-input" class="search-input" placeholder="Search posts and music..." autocomplete="off" aria-label="Search content">
+                <div id="search-results" class="search-results" role="region" aria-label="Search results" aria-live="polite">
+                    <!-- Search results will be populated here -->
+                </div>
+            </div>
+        </section>
+
         <!-- Navigation Section -->
         <section id="sidebar-nav" class="sidebar-section sidebar-nav-section">
             <h3 class="sidebar-section-title">Navigation</h3>
@@ -179,6 +190,7 @@
         <p>&copy; 2024 zuned11. All rights reserved.</p>
     </footer>
 
+    <script src="https://unpkg.com/lunr@2.3.9/lunr.min.js"></script>
     <script src="/assets/js/main.js"></script>
 </body>
 </html>

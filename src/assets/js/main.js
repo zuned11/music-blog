@@ -196,6 +196,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize everything
     initializeSidebar();
     
+    // Search functionality
+    initializeSearch();
+    
     // Audio player enhancements
     const audioPlayers = document.querySelectorAll('audio');
     audioPlayers.forEach(function(audio) {
@@ -271,4 +274,187 @@ if ('ontouchstart' in window) {
             }
         }
     });
+}
+
+// Search functionality
+function initializeSearch() {
+    const searchInput = document.getElementById('search-input');
+    const searchResults = document.getElementById('search-results');
+    
+    if (!searchInput || !searchResults) return;
+    
+    let searchIndex = null;
+    let searchDocuments = [];
+    let searchTimeout = null;
+    
+    // Load search index
+    async function loadSearchIndex() {
+        try {
+            const response = await fetch('/search.json');
+            const data = await response.json();
+            searchDocuments = data.documents;
+            
+            // Create Lunr index from the documents
+            searchIndex = lunr(function() {
+                this.ref('id');
+                this.field('title', { boost: 10 });
+                this.field('content');
+                this.field('tags', { boost: 5 });
+                this.field('excerpt', { boost: 3 });
+                this.field('artist');
+                this.field('genre');
+                
+                searchDocuments.forEach(doc => {
+                    this.add(doc);
+                });
+            });
+        } catch (error) {
+            console.error('Failed to load search index:', error);
+        }
+    }
+    
+    // Perform search
+    function performSearch(query) {
+        if (!searchIndex || !query.trim()) {
+            searchResults.innerHTML = '';
+            searchResults.style.display = 'none';
+            return;
+        }
+        
+        try {
+            const results = searchIndex.search(query);
+            displaySearchResults(results, query);
+        } catch (error) {
+            console.error('Search error:', error);
+            searchResults.innerHTML = '<div class="search-error">Search error occurred</div>';
+            searchResults.style.display = 'block';
+        }
+    }
+    
+    // Display search results
+    function displaySearchResults(results, query) {
+        if (results.length === 0) {
+            searchResults.innerHTML = '<div class="search-no-results">No results found</div>';
+            searchResults.style.display = 'block';
+            return;
+        }
+        
+        const resultsHtml = results.slice(0, 8).map(result => {
+            const doc = searchDocuments.find(d => d.id === result.ref);
+            if (!doc) return '';
+            
+            const title = highlightSearchTerms(doc.title, query);
+            const excerpt = highlightSearchTerms(
+                doc.excerpt || doc.content.substring(0, 150) + '...', 
+                query
+            );
+            const typeIcon = doc.type === 'music' ? '♪' : '📝';
+            
+            return `
+                <div class="search-result">
+                    <a href="${doc.url}" class="search-result-link">
+                        <div class="search-result-header">
+                            <span class="search-result-icon">${typeIcon}</span>
+                            <span class="search-result-title">${title}</span>
+                            <span class="search-result-type">${doc.type}</span>
+                        </div>
+                        <div class="search-result-excerpt">${excerpt}</div>
+                        ${doc.artist ? `<div class="search-result-artist">by ${doc.artist}</div>` : ''}
+                    </a>
+                </div>
+            `;
+        }).join('');
+        
+        searchResults.innerHTML = resultsHtml;
+        searchResults.style.display = 'block';
+    }
+    
+    // Highlight search terms in text
+    function highlightSearchTerms(text, query) {
+        if (!text || !query) return text;
+        
+        const words = query.toLowerCase().split(/\s+/).filter(w => w.length > 1);
+        let highlightedText = text;
+        
+        words.forEach(word => {
+            const regex = new RegExp(`(${escapeRegex(word)})`, 'gi');
+            highlightedText = highlightedText.replace(regex, '<mark>$1</mark>');
+        });
+        
+        return highlightedText;
+    }
+    
+    // Escape special regex characters
+    function escapeRegex(string) {
+        return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+    
+    // Handle search input
+    searchInput.addEventListener('input', function(e) {
+        const query = e.target.value;
+        
+        // Clear previous timeout
+        clearTimeout(searchTimeout);
+        
+        // Debounce search
+        searchTimeout = setTimeout(() => {
+            performSearch(query);
+        }, 300);
+    });
+    
+    // Hide results when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+            searchResults.style.display = 'none';
+        }
+    });
+    
+    // Show results when focusing search input (if there's content)
+    searchInput.addEventListener('focus', function() {
+        if (searchInput.value.trim() && searchResults.innerHTML) {
+            searchResults.style.display = 'block';
+        }
+    });
+    
+    // Handle keyboard navigation
+    searchInput.addEventListener('keydown', function(e) {
+        const resultLinks = searchResults.querySelectorAll('.search-result-link');
+        let currentIndex = -1;
+        
+        // Find currently focused result
+        for (let i = 0; i < resultLinks.length; i++) {
+            if (document.activeElement === resultLinks[i]) {
+                currentIndex = i;
+                break;
+            }
+        }
+        
+        switch (e.key) {
+            case 'ArrowDown':
+                e.preventDefault();
+                if (currentIndex < resultLinks.length - 1) {
+                    resultLinks[currentIndex + 1].focus();
+                } else if (resultLinks.length > 0) {
+                    resultLinks[0].focus();
+                }
+                break;
+                
+            case 'ArrowUp':
+                e.preventDefault();
+                if (currentIndex > 0) {
+                    resultLinks[currentIndex - 1].focus();
+                } else if (resultLinks.length > 0) {
+                    resultLinks[resultLinks.length - 1].focus();
+                }
+                break;
+                
+            case 'Escape':
+                searchInput.blur();
+                searchResults.style.display = 'none';
+                break;
+        }
+    });
+    
+    // Load search index on initialization
+    loadSearchIndex();
 }

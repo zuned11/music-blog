@@ -41,6 +41,7 @@
     "prettier": "^3.6.2"
   },
   "dependencies": {
+    "lunr": "^2.3.9",
     "yaml": "^2.3.4"
   }
 }

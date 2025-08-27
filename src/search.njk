@@ -1,0 +1,34 @@
+---
+permalink: /search.json
+eleventyExcludeFromCollections: true
+---
+{
+  "documents": [
+    {%- for post in collections.blog -%}
+    {
+      "id": "{{ post.url }}",
+      "title": "{{ post.data.title | escape }}",
+      "content": "{{ post.templateContent | striptags | escape }}",
+      "tags": "{{ (post.data.tags or []) | join(' ') | escape }}",
+      "type": "blog",
+      "url": "{{ post.url }}",
+      "excerpt": "{{ post.data.description | escape }}"
+    }
+    {%- if not loop.last or collections.music.length > 0 -%},{%- endif -%}
+    {%- endfor -%}
+    {%- for track in collections.music -%}
+    {
+      "id": "{{ track.url }}",
+      "title": "{{ track.data.title | escape }}",
+      "content": "{{ track.templateContent | striptags | escape }}",
+      "tags": "{{ (track.data.tags or []) | join(' ') | escape }}",
+      "type": "music",
+      "url": "{{ track.url }}",
+      "excerpt": "{{ track.data.description | escape }}",
+      "artist": "{{ track.data.artist | escape }}",
+      "genre": "{{ (track.data.genre or []) | join(' ') | escape }}"
+    }
+    {%- if not loop.last -%},{%- endif -%}
+    {%- endfor -%}
+  ]
+}
