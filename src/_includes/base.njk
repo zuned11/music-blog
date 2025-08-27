@@ -101,11 +101,13 @@
         </nav>
     </header>
 
-    <!-- Sidebar Overlay for Mobile -->
-    <div id="sidebar-overlay" class="sidebar-overlay"></div>
+    <!-- Layout Container -->
+    <div class="layout-container">
+        <!-- Sidebar Overlay for Mobile -->
+        <div id="sidebar-overlay" class="sidebar-overlay"></div>
 
-    <!-- Screen-Attached Sidebar -->
-    <aside id="sidebar" class="sidebar" role="complementary" aria-label="Navigation and recent content">
+        <!-- Screen-Attached Sidebar -->
+        <aside id="sidebar" class="sidebar" role="complementary" aria-label="Navigation and recent content">
         <!-- Sidebar Header -->
         <div class="sidebar-header">
             <h2 class="sidebar-brand">zuned11.blog</h2>
@@ -164,13 +166,14 @@
             </div>
             <a href="/blog/" class="sidebar-view-all">View all posts →</a>
         </section>
-    </aside>
+        </aside>
 
-    <main class="main">
-        <div class="content">
-            {{ content | safe }}
-        </div>
-    </main>
+        <main class="main">
+            <div class="content">
+                {{ content | safe }}
+            </div>
+        </main>
+    </div>
 
     <footer class="footer">
         <p>&copy; 2024 zuned11. All rights reserved.</p>

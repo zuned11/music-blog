@@ -58,10 +58,6 @@ body {
     border-bottom: 1px solid var(--border-color);
     color: var(--text-primary);
     padding: 1rem 0;
-    position: sticky;
-    top: 0;
-    z-index: 1100;
-    backdrop-filter: blur(8px);
 }
 
 .nav {
@@ -124,12 +120,18 @@ body {
     width: 100%;
 }
 
+/* Layout Container */
+.layout-container {
+    display: flex;
+    min-height: calc(100vh - 80px); /* Adjust based on header height */
+    position: relative;
+}
+
 /* Main Content */
 .main {
-    max-width: 1200px;
-    margin: 0 auto;
+    flex: 1;
     padding: 2rem;
-    min-height: calc(100vh - 200px);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .content {
@@ -625,7 +627,7 @@ a:hover {
 
 /* Sidebar Overlay - Only for mobile/tablet */
 .sidebar-overlay {
-    position: fixed;
+    position: absolute;
     top: 0;
     left: 0;
     width: 100%;
@@ -645,25 +647,21 @@ a:hover {
 
 /* Main Sidebar */
 .sidebar {
-    position: fixed;
-    top: 0;
-    left: -320px;
     width: 320px;
-    height: 100vh;
+    height: 100%;
     background: linear-gradient(180deg, var(--navy-darker) 0%, var(--navy-bg) 100%);
     border-right: 1px solid var(--border-color);
-    z-index: 1000;
-    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    transform: translateX(0);
     overflow-y: auto;
-    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3);
     padding: 0;
     display: flex;
     flex-direction: column;
+    flex-shrink: 0;
+    transform: translateX(-320px);
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .sidebar.open {
-    transform: translateX(320px);
+    transform: translateX(0);
 }
 
 /* Content dimming when sidebar is open */
@@ -888,11 +886,11 @@ a:hover {
 
 /* Desktop-First Responsive Design */
 
-/* Large Desktop: Auto-open sidebar, no overlay, integrated experience */
+/* Large Desktop: Auto-show sidebar, integrated layout */
 @media (min-width: 1400px) {
-    /* Auto-open behavior handled by JavaScript */
-    .sidebar.desktop-auto-open {
-        transform: translateX(320px);
+    .sidebar {
+        transform: translateX(0);
+        position: static;
     }
     
     .sidebar-toggle {
@@ -925,7 +923,13 @@ a:hover {
 }
 
 /* Desktop: Toggle-based with minimal overlay */
-@media (min-width: 1024px) and (max-width: 1199px) {
+@media (min-width: 1024px) and (max-width: 1399px) {
+    .sidebar {
+        position: absolute;
+        height: 100vh;
+        z-index: 1000;
+    }
+    
     .sidebar-toggle .toggle-text {
         opacity: 1;
     }
@@ -944,6 +948,12 @@ a:hover {
 
 /* Tablet: Full overlay with hamburger priority */
 @media (min-width: 768px) and (max-width: 1023px) {
+    .sidebar {
+        position: absolute;
+        height: 100vh;
+        z-index: 1000;
+    }
+    
     .sidebar-toggle .toggle-text {
         opacity: 0;
         width: 0;
@@ -963,7 +973,15 @@ a:hover {
     
     .sidebar {
         width: 280px;
+        position: absolute;
+        height: 100vh;
+        z-index: 1000;
+        transform: translateX(-280px);
         box-shadow: 2px 0 15px rgba(0, 0, 0, 0.4);
+    }
+    
+    .sidebar.open {
+        transform: translateX(0);
     }
     
     .sidebar-toggle .toggle-text {
