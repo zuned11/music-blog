@@ -20,12 +20,17 @@ layout: base
     {% if filename %}
     <div class="music-player">
         <div class="music-controls">
-            <audio controls preload="metadata">
-                <source src="/music-files/{{ filename }}" type="audio/flac">
+            <audio controls preload="metadata" class="music-audio-player" data-filename="{{ filename }}">
+                <source src="/music-files/{{ filename }}" type="{{ technical.mimeType or 'audio/mpeg' }}">
+                {% comment %}
+                Future: Add multiple source formats for better browser compatibility
+                <source src="/music-files/{{ filename | replace: technical.format | lower, 'mp3' }}" type="audio/mpeg">
+                <source src="/music-files/{{ filename | replace: technical.format | lower, 'ogg' }}" type="audio/ogg">
+                {% endcomment %}
                 <p>Your browser doesn't support HTML5 audio. <a href="/music-files/{{ filename }}" download>Download the track</a> instead.</p>
             </audio>
             <a href="/music-files/{{ filename }}" class="download-link" download>
-                Download FLAC
+                Download {{ technical.format or "Audio" }}
                 {% if fileSize %}({{ fileSize | formatFileSize }}){% endif %}
             </a>
         </div>
@@ -44,9 +49,9 @@ layout: base
             <h3>Technical Details</h3>
             <div class="technical-info">
                 {% if technical %}
-                <div><strong>Format:</strong> {{ technical.format or "FLAC" }}</div>
+                <div><strong>Format:</strong> {{ technical.format or "Unknown" }}</div>
                 <div><strong>Sample Rate:</strong> {{ technical.sampleRate }} Hz</div>
-                <div><strong>Bit Depth:</strong> {{ technical.bitDepth }} bit</div>
+                {% if technical.bitDepth %}<div><strong>Bit Depth:</strong> {{ technical.bitDepth }} bit</div>{% endif %}
                 <div><strong>Channels:</strong> {{ technical.channels }}</div>
                 {% if technical.bitrate %}
                 <div><strong>Bitrate:</strong> {{ technical.bitrate | formatFileSize }}bps</div>
