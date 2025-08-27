@@ -47,38 +47,4 @@ document.addEventListener('DOMContentLoaded', function() {
     
 });
 
-// Add mobile nav styles
-const mobileNavStyles = `
-@media (max-width: 768px) {
-    .nav-toggle {
-        display: block !important;
-        background: none;
-        border: none;
-        color: white;
-        font-size: 1.2rem;
-        cursor: pointer;
-        padding: 0.5rem;
-    }
-    
-    .nav-links {
-        display: none;
-        position: absolute;
-        top: 100%;
-        left: 0;
-        right: 0;
-        background-color: #2c3e50;
-        flex-direction: column;
-        padding: 1rem 2rem;
-        gap: 1rem;
-    }
-    
-    .nav-links.nav-open {
-        display: flex;
-    }
-}
-`;
-
-// Inject mobile styles
-const styleSheet = document.createElement('style');
-styleSheet.textContent = mobileNavStyles;
-document.head.appendChild(styleSheet);
+// Mobile navigation styles are now in main.css

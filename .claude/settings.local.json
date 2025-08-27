@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run build:*)",
+      "Bash(npm run serve:*)",
+      "Bash(chmod:*)",
+      "Bash(git add:*)",
+      "Bash(git checkout:*)",
+      "Bash(git commit:*)",
+      "Bash(git merge:*)",
+      "Bash(npm run test:*)",
+      "Bash(npm test)",
+      "WebSearch",
+      "Bash(git push:*)",
+      "Bash(sed:*)",
+      "Bash(echo \"Exit code: $?\")",
+      "Bash(scripts/deploy.sh:*)",
+      "Bash(scripts/rebuild.sh build:*)",
+      "Bash(scripts/local-rebuild.sh build:*)",
+      "Bash(scripts/local-rebuild.sh:*)",
+      "Bash(scripts/local-deploy.sh:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

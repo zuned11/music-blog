@@ -17,6 +17,26 @@ layout: base
         </div>
     </header>
 
+    {% if filename %}
+    <div class="music-player">
+        <div class="music-controls">
+            <audio controls preload="metadata">
+                <source src="/music-files/{{ filename }}" type="audio/flac">
+                <p>Your browser doesn't support HTML5 audio. <a href="/music-files/{{ filename }}" download>Download the track</a> instead.</p>
+            </audio>
+            <a href="/music-files/{{ filename }}" class="download-link" download>
+                Download FLAC
+                {% if fileSize %}({{ fileSize | formatFileSize }}){% endif %}
+            </a>
+        </div>
+        <div class="music-info">
+            {% if duration %}<div><strong>Duration:</strong> {{ duration | formatDuration }}</div>{% endif %}
+            {% if genre %}<div><strong>Genre:</strong> {{ genre | join(", ") }}</div>{% endif %}
+            {% if technical %}<div><strong>Quality:</strong> {{ technical.sampleRate / 1000 }}kHz / {{ technical.bitDepth }}bit</div>{% endif %}
+        </div>
+    </div>
+    {% endif %}
+
     <div class="post-content">
         {{ content | safe }}
         

@@ -1,117 +1,106 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Music Blog</title>
-    <meta name="description" content="Personal music blog and portfolio">
-    <link rel="stylesheet" href="/assets/css/main.css">
-</head>
-<body>
-    <header class="header">
-        <nav class="nav">
-            <a href="/" class="nav-logo">Music Blog</a>
-            <ul class="nav-links">
-                <li><a href="/">Home</a></li>
-                <li><a href="/blog/">Blog</a></li>
-                <li><a href="/music/">Music</a></li>
-            </ul>
-        </nav>
-    </header>
+---
+layout: base
+title: Music Blog
+description: Personal music blog and portfolio
+---
 
-    <main class="main">
+<main id="homepage" class="main">
         <div class="homepage-layout">
-            <!-- Main Content Area - Blog Feed -->
-            <div class="content-feed">
-                <header class="page-intro">
-                    <h1>Welcome to My Music Blog</h1>
-                    <p>Personal music blog and portfolio showcasing original compositions and thoughts about music.</p>
-                </header>
-                
-                <section class="blog-feed">
-                    <h2>Latest Blog Posts</h2>
-                    <div class="post-list">
-                        <article class="post-card">
-                            <h3><a href="/blog/example-post/">Welcome to My Music Blog</a></h3>
-                            <p class="post-meta">August 26, 2024</p>
-                            <p>An introduction to my music blog and what you can expect to find here. This blog will feature music reviews, personal projects, technical posts, and industry insights.</p>
-                            <a href="/blog/example-post/" class="read-more">Read more →</a>
-                        </article>
-                        
-                        <!-- Placeholder for more posts -->
-                        <article class="post-card">
-                            <h3><a href="#">Music Production Tips</a></h3>
-                            <p class="post-meta">Coming soon...</p>
-                            <p>Deep dive into audio engineering techniques and production workflows.</p>
-                            <a href="#" class="read-more">Read more →</a>
-                        </article>
-                        
-                        <article class="post-card">
-                            <h3><a href="#">Album Review: Latest Discovery</a></h3>
-                            <p class="post-meta">Coming soon...</p>
-                            <p>Exploring new releases and hidden gems in electronic music.</p>
-                            <a href="#" class="read-more">Read more →</a>
-                        </article>
-                    </div>
-                </section>
-            </div>
-            
-            <!-- Sidebar - Table of Contents -->
-            <aside class="sidebar">
-                <section class="sidebar-section">
+            <!-- SIDEBAR: Song/blog entries mini-cards on LEFT side -->
+            <aside id="sidebar" class="sidebar" role="complementary" aria-label="Recent content">
+                <section id="recent-music" class="sidebar-section">
                     <h3>🎵 Newest Song Releases</h3>
                     <div class="music-mini-list">
+                        {% for track in collections.music | head(3) %}
                         <article class="music-mini-card">
-                            <h4><a href="/music/example-track/">Latest Track</a></h4>
-                            <p class="music-mini-meta">Electronic • 4:47</p>
+                            <h4><a href="{{ track.url }}">{{ track.data.title }}</a></h4>
+                            <p class="music-mini-meta">
+                                {% if track.data.genre %}{{ track.data.genre | join(", ") }}{% else %}Music{% endif %}
+                                {% if track.data.duration %} • {{ track.data.duration | formatDuration }}{% endif %}
+                            </p>
                         </article>
-                        
+                        {% endfor %}
+                        {% if collections.music.length == 0 %}
                         <article class="music-mini-card">
-                            <h4><a href="#">Ambient Experiment</a></h4>
-                            <p class="music-mini-meta">Ambient • 6:12</p>
+                            <h4><a href="#">No music releases yet</a></h4>
+                            <p class="music-mini-meta">Coming soon</p>
                         </article>
-                        
-                        <article class="music-mini-card">
-                            <h4><a href="#">Synthwave Journey</a></h4>
-                            <p class="music-mini-meta">Synthwave • 5:33</p>
-                        </article>
+                        {% endif %}
                     </div>
                     <a href="/music/" class="view-all-link">View all music →</a>
                 </section>
                 
-                <section class="sidebar-section">
-                    <h3>📝 All Blog Entries</h3>
+                <section id="recent-blog" class="sidebar-section">
+                    <h3>📝 Recent Blog Posts</h3>
                     <div class="blog-mini-list">
+                        {% for post in collections.blog | head(4) %}
                         <article class="blog-mini-card">
-                            <h4><a href="/blog/example-post/">Welcome to My Music Blog</a></h4>
-                            <p class="blog-mini-meta">Aug 26, 2024</p>
+                            <h4><a href="{{ post.url }}">{{ post.data.title }}</a></h4>
+                            <p class="blog-mini-meta">{{ post.date | readableDate }}</p>
                         </article>
-                        
+                        {% endfor %}
+                        {% if collections.blog.length == 0 %}
                         <article class="blog-mini-card">
-                            <h4><a href="#">Music Production Tips</a></h4>
+                            <h4><a href="#">No blog posts yet</a></h4>
                             <p class="blog-mini-meta">Coming soon</p>
                         </article>
-                        
-                        <article class="blog-mini-card">
-                            <h4><a href="#">Album Review: Latest Discovery</a></h4>
-                            <p class="blog-mini-meta">Coming soon</p>
-                        </article>
-                        
-                        <article class="blog-mini-card">
-                            <h4><a href="#">Industry Insights</a></h4>
-                            <p class="blog-mini-meta">Coming soon</p>
-                        </article>
+                        {% endif %}
                     </div>
                     <a href="/blog/" class="view-all-link">View all posts →</a>
                 </section>
             </aside>
+            
+            <!-- MAIN FEED: Full blog post cards on RIGHT side -->
+            <section id="main-content" class="content-feed" role="main" aria-label="Latest blog posts">
+                <header id="page-intro" class="page-intro">
+                    <h1>Welcome to My Music Blog</h1>
+                    <p>Personal music blog and portfolio showcasing original compositions and thoughts about music.</p>
+                </header>
+                
+                <div id="blog-feed" class="blog-feed">
+                    <h2>Latest Blog Posts</h2>
+                    <div class="post-list">
+                        {% for post in collections.blog | head(3) %}
+                        <article class="post-card">
+                            <h3 class="post-card-title">
+                                <a href="{{ post.url }}">{{ post.data.title }}</a>
+                            </h3>
+                            <div class="post-meta">
+                                <time datetime="{{ post.date | htmlDateString }}">
+                                    {{ post.date | readableDate }}
+                                </time>
+                                {% if post.data.tags %}
+                                <div class="post-tags">
+                                    {% for tag in post.data.tags %}
+                                    {% if tag != "blog" %}
+                                    <span class="tag">{{ tag }}</span>
+                                    {% endif %}
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% if post.data.description %}
+                            <p class="post-excerpt">{{ post.data.description }}</p>
+                            {% endif %}
+                            <a href="{{ post.url }}" class="read-more">Read more →</a>
+                        </article>
+                        {% endfor %}
+                        
+                        {% if collections.blog.length == 0 %}
+                        <article class="post-card">
+                            <h3><a href="#">No blog posts yet</a></h3>
+                            <p class="post-meta">Coming soon...</p>
+                            <p>Check back soon for music reviews, technical articles, and industry insights!</p>
+                        </article>
+                        {% endif %}
+                    </div>
+                    
+                    {% if collections.blog.length > 3 %}
+                    <div class="view-more">
+                        <a href="/blog/" class="view-all-link">View all blog posts →</a>
+                    </div>
+                    {% endif %}
+                </div>
+            </section>
         </div>
-    </main>
-
-    <footer class="footer">
-        <p>&copy; 2024 zuned11. All rights reserved.</p>
-    </footer>
-
-    <script src="/assets/js/main.js"></script>
-</body>
-</html>
+</main>

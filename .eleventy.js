@@ -51,6 +51,12 @@ module.exports = function(eleventyConfig) {
     return new URL(url, base).href;
   });
   
+  // Array head filter
+  eleventyConfig.addFilter("head", (array, limit) => {
+    if (!Array.isArray(array)) return [];
+    return array.slice(0, limit);
+  });
+  
   // Collections
   eleventyConfig.addCollection("blog", function(collectionApi) {
     return collectionApi.getFilteredByGlob("src/content/blog/*.md").reverse();
