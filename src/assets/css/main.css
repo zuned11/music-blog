@@ -133,7 +133,7 @@ body {
 }
 
 .content {
-    max-width: 800px;
+    max-width: 1000px;
     margin: 0 auto;
 }
 
@@ -509,7 +509,7 @@ a:hover {
 
 /* Homepage Layout */
 .homepage-content {
-    max-width: 800px;
+    max-width: 1000px;
     margin: 0 auto;
     transition: margin-left 0.3s ease;
 }
@@ -682,6 +682,20 @@ a:hover {
     pointer-events: auto;
 }
 
+/* Sidebar Header */
+.sidebar-header {
+    padding: 1.5rem 1.5rem 1rem 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.sidebar-brand {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--purple-accent);
+    margin: 0;
+    text-align: center;
+}
+
 /* Sidebar Sections */
 .sidebar-section {
     padding: 1.5rem;
@@ -763,19 +777,38 @@ a:hover {
 }
 
 
-.sidebar-item a {
+.sidebar-item-link {
     color: var(--text-secondary);
     text-decoration: none;
     font-size: 0.9rem;
     line-height: 1.4;
-    display: block;
+    display: flex;
+    align-items: center;
     padding: 0.25rem 0;
     transition: color 0.2s ease;
+    gap: 0.75rem;
 }
 
-
-.sidebar-item a:hover {
+.sidebar-item-link:hover {
     color: var(--teal-accent);
+}
+
+.sidebar-item-title {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.sidebar-item-separator {
+    color: var(--text-muted);
+    font-weight: 300;
+}
+
+.sidebar-item-date {
+    flex-shrink: 0;
+    font-size: 0.8rem;
+    color: var(--text-muted);
 }
 
 
@@ -962,8 +995,12 @@ a:hover {
         margin-bottom: 0.4rem;
     }
     
-    .sidebar-item a {
+    .sidebar-item-link {
         font-size: 0.85rem;
+    }
+    
+    .sidebar-item-date {
+        font-size: 0.75rem;
     }
     
     h1 { font-size: 2rem; }

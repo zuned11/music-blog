@@ -1,6 +1,6 @@
 # Music Blog - Claude Code Project
 
-This document provides comprehensive information about the music blog project architecture, current state, and future improvement opportunities. When there are multiple options forward, ask questions and provide options rather than proceeding uninterrupted. Focus the questions mostly on high level concepts. 
+This document provides comprehensive information about the music blog project architecture, current state, and future improvement opportunities. When there are multiple options forward, ask questions and provide options rather than proceeding uninterrupted. Focus the questions mostly on high level concepts. Make sure to leave comments and notes where applicable for yourself that provide useful context, including decisions made during implementation.
 
 ## Project Overview
 
@@ -194,3 +194,4 @@ This music blog project successfully implements a robust, secure, and performant
 The combination of modern web technologies, comprehensive deployment automation, and thoughtful content management creates a sustainable platform for long-term music blogging and portfolio showcase needs.
 
 - Whenever an update is complete, run the scripts to rebuild and redeploy locally so that I can remote into the server to view them.
+- NEVER FORGET TO USE GIT THROUGHOUT THIS PROCESS.

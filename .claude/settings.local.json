@@ -18,7 +18,10 @@
       "Bash(scripts/rebuild.sh build:*)",
       "Bash(scripts/local-rebuild.sh build:*)",
       "Bash(scripts/local-rebuild.sh:*)",
-      "Bash(scripts/local-deploy.sh:*)"
+      "Bash(scripts/local-deploy.sh:*)",
+      "Bash(node:*)",
+      "Bash(git log:*)",
+      "Bash(npm run dev:*)"
     ],
     "deny": [],
     "ask": []

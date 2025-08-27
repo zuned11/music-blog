@@ -5,53 +5,9 @@ description: Personal music blog and portfolio
 ---
 
 <main id="homepage" class="main">
-        <div class="homepage-layout">
-            <!-- SIDEBAR: Song/blog entries mini-cards on LEFT side -->
-            <aside id="sidebar" class="sidebar" role="complementary" aria-label="Recent content">
-                <section id="recent-music" class="sidebar-section">
-                    <h3>🎵 Newest Song Releases</h3>
-                    <div class="music-mini-list">
-                        {% for track in collections.music | head(3) %}
-                        <article class="music-mini-card">
-                            <h4><a href="{{ track.url }}">{{ track.data.title }}</a></h4>
-                            <p class="music-mini-meta">
-                                {% if track.data.genre %}{{ track.data.genre | join(", ") }}{% else %}Music{% endif %}
-                                {% if track.data.duration %} • {{ track.data.duration | formatDuration }}{% endif %}
-                            </p>
-                        </article>
-                        {% endfor %}
-                        {% if collections.music.length == 0 %}
-                        <article class="music-mini-card">
-                            <h4><a href="#">No music releases yet</a></h4>
-                            <p class="music-mini-meta">Coming soon</p>
-                        </article>
-                        {% endif %}
-                    </div>
-                    <a href="/music/" class="view-all-link">View all music →</a>
-                </section>
-                
-                <section id="recent-blog" class="sidebar-section">
-                    <h3>📝 Recent Blog Posts</h3>
-                    <div class="blog-mini-list">
-                        {% for post in collections.blog | head(4) %}
-                        <article class="blog-mini-card">
-                            <h4><a href="{{ post.url }}">{{ post.data.title }}</a></h4>
-                            <p class="blog-mini-meta">{{ post.date | readableDate }}</p>
-                        </article>
-                        {% endfor %}
-                        {% if collections.blog.length == 0 %}
-                        <article class="blog-mini-card">
-                            <h4><a href="#">No blog posts yet</a></h4>
-                            <p class="blog-mini-meta">Coming soon</p>
-                        </article>
-                        {% endif %}
-                    </div>
-                    <a href="/blog/" class="view-all-link">View all posts →</a>
-                </section>
-            </aside>
-            
-            <!-- MAIN FEED: Full blog post cards on RIGHT side -->
-            <section id="main-content" class="content-feed" role="main" aria-label="Latest blog posts">
+    <div class="homepage-content">
+        <!-- MAIN FEED: Full blog post cards -->
+        <section id="main-content" class="content-feed" role="main" aria-label="Latest blog posts">
                 <header id="page-intro" class="page-intro">
                     <h1>Welcome to My Music Blog</h1>
                     <p>Personal music blog and portfolio showcasing original compositions and thoughts about music.</p>
@@ -102,5 +58,5 @@ description: Personal music blog and portfolio
                     {% endif %}
                 </div>
             </section>
-        </div>
+    </div>
 </main>

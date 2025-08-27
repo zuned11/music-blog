@@ -87,14 +87,84 @@
 <body>
     <header class="header">
         <nav class="nav">
-            <a href="/" class="nav-logo">Music Blog</a>
-            <ul class="nav-links">
-                <li><a href="/">Home</a></li>
-                <li><a href="/blog/">Blog</a></li>
-                <li><a href="/music/">Music</a></li>
-            </ul>
+            <div class="nav-left">
+                <button id="sidebar-toggle" class="sidebar-toggle" aria-label="Toggle sidebar menu" aria-expanded="false">
+                    <span class="hamburger-icon">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </span>
+                    <span class="toggle-text">Menu</span>
+                </button>
+                <a href="/" class="nav-logo">Music Blog</a>
+            </div>
         </nav>
     </header>
+
+    <!-- Sidebar Overlay for Mobile -->
+    <div id="sidebar-overlay" class="sidebar-overlay"></div>
+
+    <!-- Screen-Attached Sidebar -->
+    <aside id="sidebar" class="sidebar" role="complementary" aria-label="Navigation and recent content">
+        <!-- Sidebar Header -->
+        <div class="sidebar-header">
+            <h2 class="sidebar-brand">zuned11.blog</h2>
+        </div>
+        
+        <!-- Navigation Section -->
+        <section id="sidebar-nav" class="sidebar-section sidebar-nav-section">
+            <h3 class="sidebar-section-title">Navigation</h3>
+            <nav class="sidebar-nav" role="navigation" aria-label="Main navigation">
+                <ul class="sidebar-nav-list">
+                    <li><a href="/" class="sidebar-nav-link" data-page="home">Home</a></li>
+                    <li><a href="/blog/" class="sidebar-nav-link" data-page="blog">Blog</a></li>
+                    <li><a href="/music/" class="sidebar-nav-link" data-page="music">Music</a></li>
+                    <li><a href="/about/" class="sidebar-nav-link" data-page="about">About</a></li>
+                    <li><a href="/links/" class="sidebar-nav-link" data-page="links">Links</a></li>
+                </ul>
+            </nav>
+        </section>
+        
+        <!-- Music Feed Section -->
+        <section id="sidebar-music" class="sidebar-section sidebar-music-section">
+            <h3 class="sidebar-section-title">Latest Releases</h3>
+            <div class="music-feed">
+                {% for track in collections.music | head(4) %}
+                <div class="sidebar-item">
+                    <a href="{{ track.url }}" class="sidebar-item-link">
+                        <span class="sidebar-item-title">{{ track.data.title }}</span>
+                        <span class="sidebar-item-separator">|</span>
+                        <span class="sidebar-item-date">{{ track.date | sidebarDate }}</span>
+                    </a>
+                </div>
+                {% endfor %}
+                {% if collections.music.length == 0 %}
+                <div class="sidebar-empty">No music releases yet</div>
+                {% endif %}
+            </div>
+            <a href="/music/" class="sidebar-view-all">View all music →</a>
+        </section>
+        
+        <!-- Blog Posts Section -->
+        <section id="sidebar-blog" class="sidebar-section sidebar-blog-section">
+            <h3 class="sidebar-section-title">Recent Posts</h3>
+            <div class="blog-feed">
+                {% for post in collections.blog | head(5) %}
+                <div class="sidebar-item">
+                    <a href="{{ post.url }}" class="sidebar-item-link">
+                        <span class="sidebar-item-title">{{ post.data.title }}</span>
+                        <span class="sidebar-item-separator">|</span>
+                        <span class="sidebar-item-date">{{ post.date | sidebarDate }}</span>
+                    </a>
+                </div>
+                {% endfor %}
+                {% if collections.blog.length == 0 %}
+                <div class="sidebar-empty">No blog posts yet</div>
+                {% endif %}
+            </div>
+            <a href="/blog/" class="sidebar-view-all">View all posts →</a>
+        </section>
+    </aside>
 
     <main class="main">
         <div class="content">

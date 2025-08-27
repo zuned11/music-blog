@@ -24,6 +24,10 @@ module.exports = function(eleventyConfig) {
   eleventyConfig.addFilter("htmlDateString", dateObj => {
     return DateTime.fromJSDate(dateObj, {zone: 'utc'}).toFormat("yyyy-LL-dd");
   });
+
+  eleventyConfig.addFilter("sidebarDate", dateObj => {
+    return DateTime.fromJSDate(dateObj, {zone: 'utc'}).toFormat("dd-MM-yy");
+  });
   
   // Music-specific filters
   eleventyConfig.addFilter("formatDuration", duration => {
