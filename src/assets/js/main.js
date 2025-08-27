@@ -199,6 +199,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Search functionality
     initializeSearch();
     
+    // Global audio manager
+    initializeAudioManager();
+    
     // Audio player enhancements
     const audioPlayers = document.querySelectorAll('audio');
     audioPlayers.forEach(function(audio) {
@@ -457,4 +460,177 @@ function initializeSearch() {
     
     // Load search index on initialization
     loadSearchIndex();
+}
+
+// Global Audio Manager for single-track playback
+function initializeAudioManager() {
+    let currentPlayer = null;
+    let playerInstances = new Map();
+    
+    // Find all audio players on the page
+    const audioPlayers = document.querySelectorAll('.music-audio-player');
+    
+    if (audioPlayers.length === 0) {
+        return; // No audio players on this page
+    }
+    
+    // Initialize each audio player
+    audioPlayers.forEach((audio, index) => {
+        const filename = audio.getAttribute('data-filename') || `audio-${index}`;
+        const playerInstance = new AudioPlayerInstance(audio, filename);
+        playerInstances.set(filename, playerInstance);
+        
+        // Add play event listener
+        audio.addEventListener('play', function() {
+            handleAudioPlay(playerInstance);
+        });
+        
+        // Add pause/ended event listeners
+        audio.addEventListener('pause', function() {
+            handleAudioPause(playerInstance);
+        });
+        
+        audio.addEventListener('ended', function() {
+            handleAudioEnded(playerInstance);
+        });
+        
+        // Add error handling
+        audio.addEventListener('error', function() {
+            console.warn('Audio player error:', filename, audio.error);
+        });
+    });
+    
+    // Global play handler - pause other players when one starts
+    function handleAudioPlay(playingInstance) {
+        if (currentPlayer && currentPlayer !== playingInstance) {
+            currentPlayer.pause();
+        }
+        currentPlayer = playingInstance;
+        updatePlayerStates();
+    }
+    
+    function handleAudioPause(pausedInstance) {
+        if (currentPlayer === pausedInstance) {
+            currentPlayer = null;
+        }
+        updatePlayerStates();
+    }
+    
+    function handleAudioEnded(endedInstance) {
+        if (currentPlayer === endedInstance) {
+            currentPlayer = null;
+        }
+        updatePlayerStates();
+    }
+    
+    function updatePlayerStates() {
+        playerInstances.forEach(instance => {
+            instance.updateState(instance === currentPlayer);
+        });
+    }
+    
+    // Expose global interface for external control
+    window.MusicBlog = window.MusicBlog || {};
+    window.MusicBlog.AudioManager = {
+        getCurrentPlayer: () => currentPlayer,
+        getAllPlayers: () => playerInstances,
+        pauseAll: () => {
+            playerInstances.forEach(instance => instance.pause());
+            currentPlayer = null;
+            updatePlayerStates();
+        },
+        playTrack: (filename) => {
+            const instance = playerInstances.get(filename);
+            if (instance) {
+                instance.play();
+            }
+        }
+    };
+}
+
+// Audio Player Instance wrapper
+class AudioPlayerInstance {
+    constructor(audioElement, filename) {
+        this.audio = audioElement;
+        this.filename = filename;
+        this.isActive = false;
+        
+        // Find associated player container
+        this.container = audioElement.closest('.music-player');
+        
+        // Add visual enhancements
+        this.enhancePlayerUI();
+    }
+    
+    play() {
+        try {
+            const playPromise = this.audio.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(error => {
+                    console.warn('Audio play failed:', this.filename, error);
+                });
+            }
+        } catch (error) {
+            console.warn('Audio play error:', this.filename, error);
+        }
+    }
+    
+    pause() {
+        try {
+            this.audio.pause();
+        } catch (error) {
+            console.warn('Audio pause error:', this.filename, error);
+        }
+    }
+    
+    updateState(isActive) {
+        this.isActive = isActive;
+        
+        if (this.container) {
+            if (isActive) {
+                this.container.classList.add('playing');
+            } else {
+                this.container.classList.remove('playing');
+            }
+        }
+    }
+    
+    enhancePlayerUI() {
+        if (!this.container) return;
+        
+        // Add loading state handling
+        this.audio.addEventListener('loadstart', () => {
+            this.container.classList.add('loading');
+        });
+        
+        this.audio.addEventListener('canplay', () => {
+            this.container.classList.remove('loading');
+        });
+        
+        // Add time updates for future progress display
+        this.audio.addEventListener('timeupdate', () => {
+            if (this.isActive) {
+                this.updateProgress();
+            }
+        });
+    }
+    
+    updateProgress() {
+        // Future: Update custom progress bar
+        const progress = this.audio.currentTime / this.audio.duration;
+        // Store for future waveform/progress bar implementation
+        this.lastProgress = progress || 0;
+    }
+    
+    getCurrentTime() {
+        return this.audio.currentTime || 0;
+    }
+    
+    getDuration() {
+        return this.audio.duration || 0;
+    }
+    
+    getProgress() {
+        return this.lastProgress || 0;
+    }
 }

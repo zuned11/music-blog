@@ -200,10 +200,21 @@ a:hover {
 
 /* Music-specific styles */
 .music-player {
-    background-color: #ecf0f1;
+    background-color: var(--card-bg);
     padding: 1.5rem;
     border-radius: 8px;
     margin: 2rem 0;
+    border: 2px solid transparent;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.music-player.playing {
+    border-color: var(--purple-accent);
+    box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.2);
+}
+
+.music-player.loading {
+    opacity: 0.7;
 }
 
 .music-controls {
