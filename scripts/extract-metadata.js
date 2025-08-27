@@ -6,11 +6,87 @@ const path = require('path');
 const yaml = require('yaml');
 
 /**
- * Extract metadata from FLAC file using ffprobe
- * @param {string} filePath - Path to FLAC file
+ * Supported audio formats and their extensions
+ */
+const SUPPORTED_FORMATS = {
+    '.flac': { format: 'FLAC', mime: 'audio/flac' },
+    '.mp3': { format: 'MP3', mime: 'audio/mpeg' },
+    '.wav': { format: 'WAV', mime: 'audio/wav' },
+    '.aif': { format: 'AIFF', mime: 'audio/aiff' },
+    '.aiff': { format: 'AIFF', mime: 'audio/aiff' },
+    '.ogg': { format: 'OGG', mime: 'audio/ogg' },
+    '.m4a': { format: 'M4A', mime: 'audio/mp4' },
+    '.aac': { format: 'AAC', mime: 'audio/aac' }
+};
+
+/**
+ * Get audio format name from extension and codec info
+ * @param {string} ext - File extension
+ * @param {string} formatName - ffprobe format name
+ * @param {string} codecName - ffprobe codec name
+ * @returns {string} - Standardized format name
+ */
+function getAudioFormat(ext, formatName, codecName) {
+    const supported = SUPPORTED_FORMATS[ext];
+    if (supported) {
+        return supported.format;
+    }
+    
+    // Fallback to codec/format detection
+    if (codecName) {
+        if (codecName.includes('flac')) return 'FLAC';
+        if (codecName.includes('mp3')) return 'MP3';
+        if (codecName.includes('aac')) return 'AAC';
+        if (codecName.includes('pcm')) return ext === '.wav' ? 'WAV' : 'AIFF';
+        if (codecName.includes('vorbis')) return 'OGG';
+    }
+    
+    return 'Unknown';
+}
+
+/**
+ * Get MIME type for audio format
+ * @param {string} format - Audio format name
+ * @param {string} ext - File extension
+ * @returns {string} - MIME type
+ */
+function getAudioMimeType(format, ext) {
+    const supported = SUPPORTED_FORMATS[ext];
+    if (supported) {
+        return supported.mime;
+    }
+    
+    // Fallback mapping
+    const mimeMap = {
+        'FLAC': 'audio/flac',
+        'MP3': 'audio/mpeg',
+        'WAV': 'audio/wav',
+        'AIFF': 'audio/aiff',
+        'OGG': 'audio/ogg',
+        'M4A': 'audio/mp4',
+        'AAC': 'audio/aac'
+    };
+    
+    return mimeMap[format] || 'audio/mpeg';
+}
+
+/**
+ * Check if file extension is supported
+ * @param {string} filePath - Path to audio file
+ * @returns {boolean} - Whether file is supported
+ */
+function isSupportedAudioFile(filePath) {
+    const ext = path.extname(filePath).toLowerCase();
+    return Object.keys(SUPPORTED_FORMATS).includes(ext);
+}
+
+/**
+ * Extract metadata from audio file using ffprobe
+ * Supports: FLAC, MP3, WAV, AIF/AIFF, OGG, M4A, AAC
+ * @param {string} filePath - Path to audio file
  * @returns {Object} - Extracted metadata
  */
-function extractFLACMetadata(filePath) {
+function extractAudioMetadata(filePath) {
     try {
         // Use ffprobe to extract metadata as JSON
         const command = `ffprobe -v quiet -print_format json -show_format -show_streams "${filePath}"`;
@@ -20,6 +96,11 @@ function extractFLACMetadata(filePath) {
         const format = data.format || {};
         const stream = data.streams?.[0] || {};
         const tags = format.tags || {};
+        
+        // Detect audio format from file extension and codec
+        const ext = path.extname(filePath).toLowerCase();
+        const formatName = getAudioFormat(ext, format.format_name, stream.codec_name);
+        const mimeType = getAudioMimeType(formatName, ext);
         
         // Normalize tag keys (ffprobe uses uppercase, we want lowercase)
         const normalizedTags = {};
@@ -34,13 +115,18 @@ function extractFLACMetadata(filePath) {
             duration: parseFloat(format.duration) || 0,
             bitrate: parseInt(format.bit_rate) || 0,
             
+            // Format information
+            format: formatName,
+            mimeType: mimeType,
+            extension: ext,
+            
             // Audio stream information
             sampleRate: parseInt(stream.sample_rate) || 0,
             channels: stream.channels || 2,
-            bitDepth: stream.bits_per_sample || 16,
+            bitDepth: stream.bits_per_sample || (formatName === 'MP3' ? null : 16),
             
             // Metadata tags
-            title: normalizedTags.title || path.basename(filePath, '.flac'),
+            title: normalizedTags.title || path.basename(filePath, ext),
             artist: normalizedTags.artist || normalizedTags.albumartist || 'Unknown Artist',
             album: normalizedTags.album || 'Unknown Album',
             date: normalizedTags.date || normalizedTags.year || new Date().getFullYear().toString(),
@@ -92,7 +178,8 @@ function generateMarkdownFile(metadata, outputDir) {
             sampleRate: metadata.sampleRate,
             bitDepth: metadata.bitDepth,
             channels: metadata.channels === 2 ? "Stereo" : metadata.channels === 1 ? "Mono" : `${metadata.channels} channels`,
-            format: "FLAC",
+            format: metadata.format,
+            mimeType: metadata.mimeType,
             bitrate: metadata.bitrate
         }
     };
@@ -119,7 +206,7 @@ ${metadata.comment || metadata.description || 'No description available.'}
 <div class="music-player">
     <div class="music-controls">
         <audio controls preload="metadata">
-            <source src="/music-files/${metadata.filename}" type="audio/flac">
+            <source src="/music-files/${metadata.filename}" type="${metadata.mimeType}">
             <p>Your browser doesn't support HTML5 audio. <a href="/music-files/${metadata.filename}">Download the track</a> instead.</p>
         </audio>
     </div>
@@ -127,14 +214,15 @@ ${metadata.comment || metadata.description || 'No description available.'}
     <div class="music-info">
         <div><strong>Duration:</strong> ${formatDuration(metadata.duration)}</div>
         <div><strong>File Size:</strong> ${formatFileSize(metadata.fileSize)}</div>
+        <div><strong>Format:</strong> ${metadata.format}</div>
         <div><strong>Sample Rate:</strong> ${metadata.sampleRate} Hz</div>
-        <div><strong>Bit Depth:</strong> ${metadata.bitDepth} bit</div>
+        ${metadata.bitDepth ? `<div><strong>Bit Depth:</strong> ${metadata.bitDepth} bit</div>` : ''}
         <div><strong>Channels:</strong> ${frontmatter.technical.channels}</div>
         <div><strong>Genre:</strong> ${metadata.genre.join(', ')}</div>
     </div>
     
     <a href="/music-files/${metadata.filename}" class="download-link" download>
-        Download FLAC (${formatFileSize(metadata.fileSize)})
+        Download ${metadata.format} (${formatFileSize(metadata.fileSize)})
     </a>
 </div>
 
@@ -177,28 +265,35 @@ function formatFileSize(bytes) {
 }
 
 /**
- * Process a single FLAC file or all FLAC files in a directory
+ * Process a single audio file or all supported audio files in a directory
+ * Supports: FLAC, MP3, WAV, AIF/AIFF, OGG, M4A, AAC
  */
 function processFiles(inputPath, outputDir) {
     const musicContentDir = outputDir || path.join(__dirname, '../src/content/music');
     
     if (fs.statSync(inputPath).isDirectory()) {
-        // Process all FLAC files in directory
+        // Process all supported audio files in directory
         const files = fs.readdirSync(inputPath)
-            .filter(file => file.toLowerCase().endsWith('.flac'))
+            .filter(file => isSupportedAudioFile(file))
             .map(file => path.join(inputPath, file));
             
-        console.log(`Found ${files.length} FLAC files to process...`);
+        console.log(`Found ${files.length} audio files to process...`);
         
         files.forEach(filePath => {
             console.log(`Processing: ${path.basename(filePath)}`);
-            const metadata = extractFLACMetadata(filePath);
+            const metadata = extractAudioMetadata(filePath);
             generateMarkdownFile(metadata, musicContentDir);
         });
     } else {
         // Process single file
+        if (!isSupportedAudioFile(inputPath)) {
+            console.error(`Unsupported file format: ${path.basename(inputPath)}`);
+            console.error(`Supported formats: ${Object.keys(SUPPORTED_FORMATS).join(', ')}`);
+            return;
+        }
+        
         console.log(`Processing: ${path.basename(inputPath)}`);
-        const metadata = extractFLACMetadata(inputPath);
+        const metadata = extractAudioMetadata(inputPath);
         generateMarkdownFile(metadata, musicContentDir);
     }
 }
@@ -209,11 +304,15 @@ if (require.main === module) {
     const outputDir = process.argv[3];
     
     if (!inputPath) {
-        console.log('Usage: node extract-metadata.js <flac-file-or-directory> [output-directory]');
+        console.log('Usage: node extract-metadata.js <audio-file-or-directory> [output-directory]');
+        console.log('');
+        console.log('Supported formats: FLAC, MP3, WAV, AIF/AIFF, OGG, M4A, AAC');
+        console.log('');
         console.log('Examples:');
         console.log('  node extract-metadata.js song.flac');
+        console.log('  node extract-metadata.js song.mp3');
         console.log('  node extract-metadata.js ./music-files/');
-        console.log('  node extract-metadata.js song.flac ./src/content/music/');
+        console.log('  node extract-metadata.js song.wav ./src/content/music/');
         process.exit(1);
     }
     
@@ -227,7 +326,10 @@ if (require.main === module) {
 }
 
 module.exports = {
-    extractFLACMetadata,
+    extractAudioMetadata,
+    extractFLACMetadata: extractAudioMetadata, // Backward compatibility alias
     generateMarkdownFile,
-    processFiles
+    processFiles,
+    isSupportedAudioFile,
+    SUPPORTED_FORMATS
 };
