@@ -889,22 +889,20 @@ a:hover {
 /* Desktop-First Responsive Design */
 
 /* Large Desktop: Auto-open sidebar, no overlay, integrated experience */
-@media (min-width: 1200px) {
+@media (min-width: 1400px) {
     /* Auto-open behavior handled by JavaScript */
     .sidebar.desktop-auto-open {
         transform: translateX(320px);
     }
     
-    .sidebar-toggle .toggle-text {
-        opacity: 1;
+    .sidebar-toggle {
+        display: none;
     }
     
-    /* No content dimming on desktop, add margin for sidebar */
+    /* No content dimming on desktop */
     .sidebar-open .main {
         filter: none;
         pointer-events: auto;
-        margin-left: 320px;
-        transition: margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
     
     /* No overlay on desktop */
