@@ -21,7 +21,10 @@
       "Bash(scripts/local-deploy.sh:*)",
       "Bash(node:*)",
       "Bash(git log:*)",
-      "Bash(npm run dev:*)"
+      "Bash(npm run dev:*)",
+      "Bash(npm run:*)",
+      "Bash(npm test:*)",
+      "Bash(npx jest:*)"
     ],
     "deny": [],
     "ask": []

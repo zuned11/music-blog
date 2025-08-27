@@ -6,16 +6,16 @@ test.describe('Site Navigation', () => {
     await page.goto('/');
     await expect(page.locator('h1')).toHaveText('Welcome to My Music Blog');
     
-    // Navigate to blog
-    await page.click('nav a[href="/blog/"]');
+    // Navigate to blog using sidebar navigation
+    await page.click('.sidebar a[href="/blog/"]');
     await expect(page).toHaveURL(/.*\/blog\//);
     
     // Navigate to music
-    await page.click('nav a[href="/music/"]');
+    await page.click('.sidebar a[href="/music/"]');
     await expect(page).toHaveURL(/.*\/music\//);
     
     // Navigate back home
-    await page.click('nav a[href="/"]');
+    await page.click('.sidebar a[href="/"]');
     await expect(page).toHaveURL('/');
   });
 
@@ -48,14 +48,15 @@ test.describe('Site Navigation', () => {
   test('should show active navigation state', async ({ page }) => {
     await page.goto('/');
     
-    // Check that home link has active styling (if implemented)
-    const homeLink = page.locator('nav a[href="/"]');
+    // Check that home link has active styling in sidebar
+    const homeLink = page.locator('.sidebar a[href="/"]');
     await expect(homeLink).toBeVisible();
+    await expect(homeLink).toHaveClass(/active/);
     
     // Navigate to blog and check if blog link gets active styling
-    await page.click('nav a[href="/blog/"]');
-    const blogLink = page.locator('nav a[href="/blog/"]');
-    await expect(blogLink).toBeVisible();
+    await page.click('.sidebar a[href="/blog/"]');
+    const blogLink = page.locator('.sidebar a[href="/blog/"]');
+    await expect(blogLink).toHaveClass(/active/);
   });
 
   test('should handle 404 pages gracefully', async ({ page }) => {
@@ -69,8 +70,8 @@ test.describe('Site Navigation', () => {
   test('should have proper link accessibility', async ({ page }) => {
     await page.goto('/');
     
-    // Check that all navigation links are keyboard accessible
-    const navLinks = page.locator('nav a');
+    // Check that all sidebar navigation links are keyboard accessible
+    const navLinks = page.locator('.sidebar-nav a');
     const linkCount = await navLinks.count();
     
     for (let i = 0; i < linkCount; i++) {
