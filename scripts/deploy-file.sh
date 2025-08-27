@@ -37,13 +37,16 @@ show_usage() {
     echo ""
     echo "Examples:"
     echo "  $0 ~/my-post.md                    # Deploy blog post"
-    echo "  $0 ~/my-track.flac                 # Deploy music file"
+    echo "  $0 ~/my-track.flac                 # Deploy FLAC music file"
+    echo "  $0 ~/my-song.mp3                   # Deploy MP3 music file"
     echo "  $0 ~/my-post.md --dry-run          # Preview deployment"
     echo ""
     echo "File Types:"
-    echo "  *.md         -> Deployed to blog or music content based on location"
-    echo "  *.flac       -> Deployed to music-files directory"
-    echo "  Other files  -> Deployed to project root"
+    echo "  *.md                    -> Deployed to blog or music content based on location"
+    echo "  *.flac,*.mp3,*.wav,etc  -> Deployed to music-files directory"
+    echo "  Other files             -> Deployed to project root"
+    echo ""
+    echo "Supported audio formats: FLAC, MP3, WAV, AIF/AIFF, OGG, M4A, AAC"
 }
 
 # Function to determine target directory based on file type and name
@@ -53,7 +56,7 @@ get_target_dir() {
     local extension="${filename##*.}"
     
     case "$extension" in
-        "flac")
+        "flac"|"mp3"|"wav"|"aif"|"aiff"|"ogg"|"m4a"|"aac")
             echo "$MUSIC_FILES_DIR"
             ;;
         "md")
@@ -122,7 +125,7 @@ deploy_file() {
             # Suggest next steps based on file type
             local extension="${filename##*.}"
             case "$extension" in
-                "flac")
+                "flac"|"mp3"|"wav"|"aif"|"aiff"|"ogg"|"m4a"|"aac")
                     echo ""
                     log_info "Next steps:"
                     echo "  1. Run metadata extraction: ./rebuild.sh extract-music"

@@ -32,20 +32,23 @@ show_usage() {
     echo "  file1, file2, ...    Paths to files to deploy"
     echo ""
     echo "Options:"
-    echo "  --extract            Run metadata extraction after FLAC uploads"
+    echo "  --extract            Run metadata extraction after audio uploads"
     echo "  --dry-run            Show what would be transferred without actually doing it"
     echo "  --help, -h           Show this help message"
     echo ""
     echo "Examples:"
     echo "  $0 post1.md post2.md track.flac     # Deploy multiple files"
     echo "  $0 *.md                             # Deploy all markdown files"
+    echo "  $0 ~/music/*.mp3 --extract          # Deploy MP3 files with extraction"
     echo "  $0 ~/music/*.flac --extract         # Deploy FLAC files with extraction"
-    echo "  $0 file1.md file2.flac --dry-run    # Preview deployment"
+    echo "  $0 file1.md file2.wav --dry-run     # Preview deployment"
     echo ""
     echo "File Types:"
-    echo "  *.md     -> Routed to blog or music content directories"
-    echo "  *.flac   -> Routed to music-files directory"
-    echo "  Others   -> Routed to project root"
+    echo "  *.md                     -> Routed to blog or music content directories"
+    echo "  *.flac,*.mp3,*.wav,etc   -> Routed to music-files directory"
+    echo "  Others                   -> Routed to project root"
+    echo ""
+    echo "Supported audio formats: FLAC, MP3, WAV, AIF/AIFF, OGG, M4A, AAC"
 }
 
 # Function to categorize files
@@ -53,7 +56,7 @@ categorize_files() {
     local files=("$@")
     local blog_files=()
     local music_files=()
-    local flac_files=()
+    local audio_files=()
     local other_files=()
     
     for file in "${files[@]}"; do
@@ -66,8 +69,8 @@ categorize_files() {
         local extension="${filename##*.}"
         
         case "${extension,,}" in
-            "flac")
-                flac_files+=("$file")
+            "flac"|"mp3"|"wav"|"aif"|"aiff"|"ogg"|"m4a"|"aac")
+                audio_files+=("$file")
                 ;;
             "md")
                 # Determine if it's blog or music content
@@ -91,7 +94,7 @@ categorize_files() {
     # Return results via global arrays
     BLOG_FILES=("${blog_files[@]}")
     MUSIC_FILES=("${music_files[@]}")
-    FLAC_FILES=("${flac_files[@]}")
+    AUDIO_FILES=("${audio_files[@]}")
     OTHER_FILES=("${other_files[@]}")
 }
 
@@ -141,7 +144,7 @@ deploy_files_to_dir() {
 show_deployment_summary() {
     local blog_count=$1
     local music_count=$2
-    local flac_count=$3
+    local audio_count=$3
     local other_count=$4
     local dry_run=$5
     
@@ -155,14 +158,14 @@ show_deployment_summary() {
     echo "Files processed:"
     echo "  Blog posts: $blog_count"
     echo "  Music content: $music_count"
-    echo "  FLAC files: $flac_count"
+    echo "  Audio files: $audio_count"
     echo "  Other files: $other_count"
-    echo "  Total: $((blog_count + music_count + flac_count + other_count))"
+    echo "  Total: $((blog_count + music_count + audio_count + other_count))"
     
     if [[ "$dry_run" != "true" ]]; then
         echo ""
         log_info "Next steps:"
-        if [[ $flac_count -gt 0 ]]; then
+        if [[ $audio_count -gt 0 ]]; then
             echo "  1. Extract metadata: ./rebuild.sh extract-music"
             echo "  2. Edit generated markdown files in src/content/music/"
             echo "  3. Rebuild site: ./rebuild.sh build"
@@ -254,10 +257,10 @@ main() {
         fi
     fi
     
-    # Deploy FLAC files
-    if [[ ${#FLAC_FILES[@]} -gt 0 ]]; then
+    # Deploy audio files
+    if [[ ${#AUDIO_FILES[@]} -gt 0 ]]; then
         echo ""
-        if ! deploy_files_to_dir "music-files" "music files" "$dry_run" "${FLAC_FILES[@]}"; then
+        if ! deploy_files_to_dir "music-files" "audio files" "$dry_run" "${AUDIO_FILES[@]}"; then
             success=false
         fi
     fi
@@ -271,9 +274,9 @@ main() {
     fi
     
     # Run metadata extraction if requested and successful
-    if [[ "$success" == "true" && "$dry_run" != "true" && "$extract" == "true" && ${#FLAC_FILES[@]} -gt 0 ]]; then
+    if [[ "$success" == "true" && "$dry_run" != "true" && "$extract" == "true" && ${#AUDIO_FILES[@]} -gt 0 ]]; then
         echo ""
-        log_info "Running metadata extraction for FLAC files..."
+        log_info "Running metadata extraction for audio files..."
         if ssh "$REMOTE_HOST" "cd '$REMOTE_BASE' && npm run extract-music"; then
             log_success "Metadata extraction completed"
         else
@@ -283,7 +286,7 @@ main() {
     fi
     
     # Show summary
-    show_deployment_summary "${#BLOG_FILES[@]}" "${#MUSIC_FILES[@]}" "${#FLAC_FILES[@]}" "${#OTHER_FILES[@]}" "$dry_run"
+    show_deployment_summary "${#BLOG_FILES[@]}" "${#MUSIC_FILES[@]}" "${#AUDIO_FILES[@]}" "${#OTHER_FILES[@]}" "$dry_run"
     
     if [[ "$success" == "true" ]]; then
         echo ""
@@ -299,7 +302,7 @@ main() {
 # Global arrays for file categorization
 declare -a BLOG_FILES
 declare -a MUSIC_FILES
-declare -a FLAC_FILES
+declare -a AUDIO_FILES
 declare -a OTHER_FILES
 
 # Check if script is being sourced or executed

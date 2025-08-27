@@ -39,12 +39,15 @@ show_usage() {
     echo ""
     echo "Examples:"
     echo "  $0 ~/my-track.flac                    # Upload FLAC file"
-    echo "  $0 ~/my-track.flac --extract          # Upload and extract metadata"
+    echo "  $0 ~/my-song.mp3                      # Upload MP3 file"
+    echo "  $0 ~/my-track.wav --extract           # Upload WAV and extract metadata"
     echo "  $0 ~/my-track.flac --dry-run          # Preview upload"
+    echo ""
+    echo "Supported formats: FLAC, MP3, WAV, AIF/AIFF, OGG, M4A, AAC"
 }
 
-# Function to validate FLAC file
-validate_flac_file() {
+# Function to validate audio file
+validate_audio_file() {
     local file_path="$1"
     
     # Check if file exists
@@ -57,11 +60,16 @@ validate_flac_file() {
     local filename=$(basename "$file_path")
     local extension="${filename##*.}"
     
-    if [[ "${extension,,}" != "flac" ]]; then
-        log_error "File is not a FLAC file: $filename"
-        log_error "Only FLAC files are supported (.flac extension required)"
-        return 1
-    fi
+    case "${extension,,}" in
+        flac|mp3|wav|aif|aiff|ogg|m4a|aac)
+            log_info "Detected audio format: ${extension^^}"
+            ;;
+        *)
+            log_error "Unsupported audio format: $filename"
+            log_error "Supported formats: FLAC, MP3, WAV, AIF/AIFF, OGG, M4A, AAC"
+            return 1
+            ;;
+    esac
     
     # Check file size (warn if too large)
     local file_size=$(stat -f%z "$file_path" 2>/dev/null || stat -c%s "$file_path" 2>/dev/null || echo "0")
@@ -74,12 +82,12 @@ validate_flac_file() {
     
     # Try to get basic file info (if ffprobe is available)
     if command -v ffprobe >/dev/null 2>&1; then
-        log_info "Validating FLAC file format..."
+        log_info "Validating audio file format..."
         if ! ffprobe -v quiet -print_format json -show_format "$file_path" >/dev/null 2>&1; then
-            log_warn "File may be corrupted or not a valid FLAC file"
+            log_warn "File may be corrupted or not a valid audio file"
             log_warn "Proceeding anyway..."
         else
-            log_success "FLAC file validation passed"
+            log_success "Audio file validation passed"
         fi
     fi
     
@@ -93,7 +101,7 @@ upload_flac() {
     local extract="$3"
     
     # Validate file
-    if ! validate_flac_file "$source_file"; then
+    if ! validate_audio_file "$source_file"; then
         return 1
     fi
     
