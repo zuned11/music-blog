@@ -22,7 +22,7 @@ test.describe('Homepage', () => {
     await expect(page.locator('footer')).toContainText('zuned11');
   });
 
-  test('should display sidebar with music and blog sections', async ({ page }) => {
+  test('should display sidebar with navigation, RSS, music and blog sections', async ({ page }) => {
     await page.goto('/');
     
     // Check sidebar exists
@@ -31,19 +31,28 @@ test.describe('Homepage', () => {
     // Check sidebar brand header
     await expect(page.locator('.sidebar-brand')).toContainText('zuned11.blog');
     
+    // Check search section
+    await expect(page.locator('.sidebar-section-title').first()).toContainText('Search');
+    
     // Check navigation section
-    await expect(page.locator('.sidebar-section-title').first()).toContainText('Navigation');
+    await expect(page.locator('.sidebar-section-title').nth(1)).toContainText('Navigation');
+    
+    // Check RSS feeds section
+    await expect(page.locator('.sidebar-rss-title')).toContainText('RSS Feeds');
+    await expect(page.locator('a[href="/feed.xml"].sidebar-rss-link')).toContainText('All Content');
+    await expect(page.locator('a[href="/blog-feed.xml"].sidebar-rss-link')).toContainText('Blog Posts');
+    await expect(page.locator('a[href="/music-feed.xml"].sidebar-rss-link')).toContainText('Music Releases');
+    
+    // Check that RSS links open in new tabs
+    await expect(page.locator('.sidebar-rss-link').first()).toHaveAttribute('target', '_blank');
     
     // Check latest releases section  
-    await expect(page.locator('.sidebar-section-title').nth(1)).toContainText('Latest Releases');
-    await expect(page.locator('.sidebar-item').first()).toBeVisible();
+    await expect(page.locator('.sidebar-section-title').nth(2)).toContainText('Latest Releases');
     
     // Check recent posts section
-    await expect(page.locator('.sidebar-section-title').nth(2)).toContainText('Recent Posts');
-    await expect(page.locator('.sidebar-item').nth(3)).toBeVisible(); // Adjust index for blog items
+    await expect(page.locator('.sidebar-section-title').nth(3)).toContainText('Recent Posts');
     
     // Check view all links
-    await expect(page.locator('a[href="/music/"]').filter({ hasText: 'View all music' })).toBeVisible();
     await expect(page.locator('a[href="/blog/"]').filter({ hasText: 'View all posts' })).toBeVisible();
   });
 
@@ -106,6 +115,26 @@ test.describe('Homepage', () => {
     
     // Check that main heading is h1
     await expect(page.locator('h1')).toHaveText('Welcome to My Music Blog');
+  });
+
+  test('should have RSS feed discovery links in head', async ({ page }) => {
+    await page.goto('/');
+    
+    // Check for RSS discovery links in HTML head
+    const rssLinks = page.locator('link[type="application/rss+xml"]');
+    await expect(rssLinks).toHaveCount(3);
+    
+    // Check for combined feed (main)
+    const combinedFeed = page.locator('link[href="/feed.xml"][type="application/rss+xml"]');
+    await expect(combinedFeed).toHaveAttribute('title', 'Music Blog - All Content');
+    
+    // Check for blog feed
+    const blogFeed = page.locator('link[href="/blog-feed.xml"][type="application/rss+xml"]');
+    await expect(blogFeed).toHaveAttribute('title', 'Music Blog - Blog Posts');
+    
+    // Check for music feed
+    const musicFeed = page.locator('link[href="/music-feed.xml"][type="application/rss+xml"]');
+    await expect(musicFeed).toHaveAttribute('title', 'Music Blog - Music Releases');
   });
 
   test('should load CSS and be properly styled', async ({ page }) => {

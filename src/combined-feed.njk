@@ -1,0 +1,63 @@
+---
+permalink: /feed.xml
+eleventyExcludeFromCollections: true
+---
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>{{ site.name }}</title>
+    <link>{{ site.url }}</link>
+    <atom:link href="{{ '/feed.xml' | absoluteUrl(site.url) }}" rel="self" type="application/rss+xml"/>
+    <description>{{ site.description }} - Blog posts and music releases</description>
+    <language>en</language>
+    <lastBuildDate>{{ collections.combined | getNewestCollectionItemDate | dateToRfc822 }}</lastBuildDate>
+    
+    {%- for item in collections.combined | reverse %}
+    {%- if loop.index0 < 20 %}
+    <item>
+      {%- if item.data.tags and "music" in item.data.tags %}
+      <title>{{ item.data.title | e }}{% if item.data.artist %} - {{ item.data.artist | e }}{% endif %}</title>
+      <link>{{ item.url | absoluteUrl(site.url) }}</link>
+      <description>
+        {%- if item.data.description -%}
+        {{ item.data.description | e | truncate(300) }}
+        {%- else -%}
+        New music release: {{ item.data.title }}{% if item.data.artist %} by {{ item.data.artist }}{% endif %}{% if item.data.album and item.data.album != "Unknown Album" %} from the album "{{ item.data.album }}"{% endif %}.
+        {%- endif -%}
+        {%- if item.data.genre %} Genre: {{ item.data.genre | join(", ") }}.{% endif %}
+        {%- if item.data.duration %} Duration: {{ item.data.duration | formatDuration }}.{% endif %}
+        {%- if item.data.filename %} High-quality FLAC download available.{% endif %}
+      </description>
+      <pubDate>{{ item.date | dateToRfc822 }}</pubDate>
+      <guid isPermaLink="false">{{ item.url | absoluteUrl(site.url) }}</guid>
+      {%- if item.data.genre %}
+      {%- for genre in item.data.genre %}
+      <category>{{ genre }}</category>
+      {%- endfor %}
+      {%- endif %}
+      <category>music</category>
+      {%- if item.data.filename %}
+      <enclosure url="{{ '/music-files/' + item.data.filename | absoluteUrl(site.url) }}" 
+                 length="{{ item.data.fileSize or 0 }}" 
+                 type="audio/flac" />
+      {%- endif %}
+      {%- else %}
+      <title>{{ item.data.title | e }}</title>
+      <link>{{ item.url | absoluteUrl(site.url) }}</link>
+      <description>{{ item.data.description or item.templateContent | striptags | e | truncate(300) }}</description>
+      <pubDate>{{ item.date | dateToRfc822 }}</pubDate>
+      <guid isPermaLink="false">{{ item.url | absoluteUrl(site.url) }}</guid>
+      {%- if item.data.tags %}
+      {%- for tag in item.data.tags %}
+      {%- if tag != "blog" %}
+      <category>{{ tag }}</category>
+      {%- endif %}
+      {%- endfor %}
+      {%- endif %}
+      <category>blog</category>
+      {%- endif %}
+    </item>
+    {%- endif %}
+    {%- endfor %}
+  </channel>
+</rss>

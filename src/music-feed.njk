@@ -15,11 +15,11 @@ eleventyExcludeFromCollections: true
     {%- for track in collections.music | reverse %}
     {%- if loop.index0 < 20 %}
     <item>
-      <title>{{ track.data.title | htmlEscape }}{% if track.data.artist %} - {{ track.data.artist | htmlEscape }}{% endif %}</title>
+      <title>{{ track.data.title | e }}{% if track.data.artist %} - {{ track.data.artist | e }}{% endif %}</title>
       <link>{{ track.url | absoluteUrl(site.url) }}</link>
       <description>
         {%- if track.data.description -%}
-        {{ track.data.description | htmlEscape | truncate(300) }}
+        {{ track.data.description | e | truncate(300) }}
         {%- else -%}
         New music release: {{ track.data.title }}{% if track.data.artist %} by {{ track.data.artist }}{% endif %}{% if track.data.album and track.data.album != "Unknown Album" %} from the album "{{ track.data.album }}"{% endif %}.
         {%- endif -%}

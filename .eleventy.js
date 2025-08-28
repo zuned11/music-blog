@@ -74,6 +74,13 @@ module.exports = function(eleventyConfig) {
   eleventyConfig.addCollection("musicPaginated", function(collectionApi) {
     return collectionApi.getFilteredByGlob("src/content/music/*.md").reverse();
   });
+
+  // Combined collection for RSS feed
+  eleventyConfig.addCollection("combined", function(collectionApi) {
+    const blog = collectionApi.getFilteredByGlob("src/content/blog/*.md");
+    const music = collectionApi.getFilteredByGlob("src/content/music/*.md");
+    return [...blog, ...music].sort((a, b) => b.date - a.date);
+  });
   
   // Markdown configuration
   const markdownLibrary = markdownIt({
