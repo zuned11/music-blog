@@ -138,31 +138,32 @@ test.describe('RSS Feed Functionality', () => {
       await expect(musicFeed).toHaveAttribute('title', 'Music Blog - Music Releases');
     });
 
-    test('RSS links are present in sidebar navigation', async ({ page }) => {
+    test('RSS links are present in footer', async ({ page }) => {
       await page.goto('/');
       
-      // Check for visible RSS section in sidebar
-      await expect(page.locator('.sidebar-rss-title')).toContainText('RSS Feeds');
+      // Check for visible RSS section in footer
+      await expect(page.locator('.footer-rss-links')).toBeVisible();
+      await expect(page.locator('.footer-rss-label')).toContainText('RSS:');
       
       // Check for RSS feed links
-      const allContentLink = page.locator('a[href="/feed.xml"].sidebar-rss-link');
+      const allContentLink = page.locator('a[href="/feed.xml"].footer-rss-link');
       await expect(allContentLink).toBeVisible();
       await expect(allContentLink).toContainText('All Content');
       
-      const blogLink = page.locator('a[href="/blog-feed.xml"].sidebar-rss-link');
+      const blogLink = page.locator('a[href="/blog-feed.xml"].footer-rss-link');
       await expect(blogLink).toBeVisible();
       await expect(blogLink).toContainText('Blog Posts');
       
-      const musicLink = page.locator('a[href="/music-feed.xml"].sidebar-rss-link');
+      const musicLink = page.locator('a[href="/music-feed.xml"].footer-rss-link');
       await expect(musicLink).toBeVisible();
       await expect(musicLink).toContainText('Music Releases');
     });
 
-    test('RSS sidebar links open in new tabs', async ({ page }) => {
+    test('RSS footer links open in new tabs', async ({ page }) => {
       await page.goto('/');
       
       // All RSS links should have target="_blank"
-      const rssLinks = page.locator('.sidebar-rss-link');
+      const rssLinks = page.locator('.footer-rss-link');
       const count = await rssLinks.count();
       
       for (let i = 0; i < count; i++) {

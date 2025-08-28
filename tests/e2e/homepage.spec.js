@@ -22,7 +22,7 @@ test.describe('Homepage', () => {
     await expect(page.locator('footer')).toContainText('zuned11');
   });
 
-  test('should display sidebar with navigation, RSS, music and blog sections', async ({ page }) => {
+  test('should display sidebar with navigation, music and blog sections', async ({ page }) => {
     await page.goto('/');
     
     // Check sidebar exists
@@ -37,15 +37,6 @@ test.describe('Homepage', () => {
     // Check navigation section
     await expect(page.locator('.sidebar-section-title').nth(1)).toContainText('Navigation');
     
-    // Check RSS feeds section
-    await expect(page.locator('.sidebar-rss-title')).toContainText('RSS Feeds');
-    await expect(page.locator('a[href="/feed.xml"].sidebar-rss-link')).toContainText('All Content');
-    await expect(page.locator('a[href="/blog-feed.xml"].sidebar-rss-link')).toContainText('Blog Posts');
-    await expect(page.locator('a[href="/music-feed.xml"].sidebar-rss-link')).toContainText('Music Releases');
-    
-    // Check that RSS links open in new tabs
-    await expect(page.locator('.sidebar-rss-link').first()).toHaveAttribute('target', '_blank');
-    
     // Check latest releases section  
     await expect(page.locator('.sidebar-section-title').nth(2)).toContainText('Latest Releases');
     
@@ -54,6 +45,28 @@ test.describe('Homepage', () => {
     
     // Check view all links
     await expect(page.locator('a[href="/blog/"]').filter({ hasText: 'View all posts' })).toBeVisible();
+  });
+
+  test('should display RSS links in footer', async ({ page }) => {
+    await page.goto('/');
+    
+    // Check footer RSS section
+    await expect(page.locator('.footer-rss-links')).toBeVisible();
+    await expect(page.locator('.footer-rss-label')).toContainText('RSS:');
+    
+    // Check individual RSS links
+    await expect(page.locator('a[href="/feed.xml"].footer-rss-link')).toContainText('All Content');
+    await expect(page.locator('a[href="/blog-feed.xml"].footer-rss-link')).toContainText('Blog Posts');
+    await expect(page.locator('a[href="/music-feed.xml"].footer-rss-link')).toContainText('Music Releases');
+    
+    // Check that RSS links open in new tabs
+    await expect(page.locator('.footer-rss-link').first()).toHaveAttribute('target', '_blank');
+    
+    // Check separators are present
+    await expect(page.locator('.footer-rss-separator').first()).toContainText('|');
+    
+    // Check updated copyright
+    await expect(page.locator('footer p')).toContainText('© 2025 zuned11');
   });
 
   test('should display blog feed in main content area', async ({ page }) => {

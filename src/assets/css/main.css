@@ -797,6 +797,33 @@ a:hover {
     margin-top: 4rem;
 }
 
+.footer-rss-links {
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+}
+
+.footer-rss-label {
+    color: var(--text-muted);
+    font-weight: 500;
+    margin-right: 0.5rem;
+}
+
+.footer-rss-link {
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: color 0.2s ease;
+    padding: 0 0.5rem;
+}
+
+.footer-rss-link:hover {
+    color: var(--purple-accent);
+}
+
+.footer-rss-separator {
+    color: var(--text-muted);
+    margin: 0 0.5rem;
+}
+
 /* Homepage Layout */
 .homepage-content {
     max-width: 1000px;
