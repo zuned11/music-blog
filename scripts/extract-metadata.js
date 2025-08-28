@@ -173,7 +173,7 @@ function generateMarkdownFile(metadata, outputDir) {
         fileSize: metadata.fileSize,
         filename: metadata.filename,
         tags: ["music", ...metadata.genre.map(g => g.toLowerCase())],
-        layout: "music",
+        permalink: false,
         technical: {
             sampleRate: metadata.sampleRate,
             bitDepth: metadata.bitDepth,
@@ -190,7 +190,7 @@ function generateMarkdownFile(metadata, outputDir) {
     if (metadata.comment) frontmatter.description = metadata.comment;
     if (metadata.description) frontmatter.description = metadata.description;
     
-    // Generate markdown content
+    // Generate simplified markdown content (metadata only for centralized player)
     const yamlFrontmatter = yaml.stringify(frontmatter);
     const content = `---
 ${yamlFrontmatter}---
@@ -201,35 +201,10 @@ ${metadata.artist ? `*by ${metadata.artist}*` : ''}
 
 ${metadata.comment || metadata.description || 'No description available.'}
 
-## Audio Player
-
-<div class="music-player">
-    <div class="music-controls">
-        <audio controls preload="metadata">
-            <source src="/music-files/${metadata.filename}" type="${metadata.mimeType}">
-            <p>Your browser doesn't support HTML5 audio. <a href="/music-files/${metadata.filename}">Download the track</a> instead.</p>
-        </audio>
-    </div>
-    
-    <div class="music-info">
-        <div><strong>Duration:</strong> ${formatDuration(metadata.duration)}</div>
-        <div><strong>File Size:</strong> ${formatFileSize(metadata.fileSize)}</div>
-        <div><strong>Format:</strong> ${metadata.format}</div>
-        <div><strong>Sample Rate:</strong> ${metadata.sampleRate} Hz</div>
-        ${metadata.bitDepth ? `<div><strong>Bit Depth:</strong> ${metadata.bitDepth} bit</div>` : ''}
-        <div><strong>Channels:</strong> ${frontmatter.technical.channels}</div>
-        <div><strong>Genre:</strong> ${metadata.genre.join(', ')}</div>
-    </div>
-    
-    <a href="/music-files/${metadata.filename}" class="download-link" download>
-        Download ${metadata.format} (${formatFileSize(metadata.fileSize)})
-    </a>
-</div>
-
 ${metadata.album !== 'Unknown Album' ? `## Album Information\n\n**Album:** ${metadata.album}` : ''}
-${metadata.date !== new Date().getFullYear().toString() ? `\n**Release Date:** ${metadata.date}` : ''}
 ${metadata.composer ? `\n**Composer:** ${metadata.composer}` : ''}
 ${metadata.performer ? `\n**Performer:** ${metadata.performer}` : ''}
+
 `;
     
     // Ensure output directory exists

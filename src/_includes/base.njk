@@ -144,7 +144,7 @@
             <div class="music-feed">
                 {% for track in collections.music | head(4) %}
                 <div class="sidebar-item">
-                    <a href="{{ track.url }}" class="sidebar-item-link">
+                    <a href="/music/" class="sidebar-item-link">
                         <span class="sidebar-item-title">{{ track.data.title }}</span>
                         <span class="sidebar-item-separator">|</span>
                         <span class="sidebar-item-date">{{ track.date | sidebarDate }}</span>
@@ -155,7 +155,6 @@
                 <div class="sidebar-empty">No music releases yet</div>
                 {% endif %}
             </div>
-            <a href="/music/" class="sidebar-view-all">View all music →</a>
         </section>
         
         <!-- Blog Posts Section -->

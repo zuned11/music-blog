@@ -771,3 +771,268 @@ class AudioPlayerInstance {
         return this.lastProgress || 0;
     }
 }
+
+// Global Audio Manager for centralized music playback
+class GlobalAudioManager {
+    constructor() {
+        this.currentPlayer = null;
+        this.bottomPlayer = null;
+        this.globalAudio = null;
+        this.tracks = [];
+        this.currentTrackIndex = -1;
+        
+        this.init();
+    }
+    
+    init() {
+        // Initialize bottom player elements
+        this.bottomPlayer = document.getElementById('bottom-player');
+        this.globalAudio = document.getElementById('global-audio');
+        
+        if (!this.bottomPlayer || !this.globalAudio) return;
+        
+        // Get bottom player controls
+        this.playButton = document.getElementById('global-play-button');
+        this.volumeButton = this.bottomPlayer.querySelector('.player-volume-button');
+        this.volumeSlider = this.bottomPlayer.querySelector('.player-volume-slider');
+        this.volumeFill = this.bottomPlayer.querySelector('.player-volume-fill');
+        this.progressBar = this.bottomPlayer.querySelector('.player-progress-bar');
+        this.progressFill = this.bottomPlayer.querySelector('.player-progress-fill');
+        this.currentTimeDisplay = this.bottomPlayer.querySelector('.player-current-time');
+        this.durationDisplay = this.bottomPlayer.querySelector('.player-duration');
+        this.titleDisplay = this.bottomPlayer.querySelector('.player-title');
+        this.artistDisplay = this.bottomPlayer.querySelector('.player-artist');
+        
+        // Collect all tracks from the page
+        this.collectTracks();
+        
+        // Setup event listeners
+        this.setupEventListeners();
+        
+        // Initialize volume
+        this.setVolume(0.8);
+    }
+    
+    collectTracks() {
+        const songItems = document.querySelectorAll('.song-item[data-filename]');
+        this.tracks = Array.from(songItems).map((item, index) => ({
+            element: item,
+            filename: item.dataset.filename,
+            title: item.querySelector('.song-title')?.textContent || 'Unknown',
+            artist: item.querySelector('.song-artist')?.textContent || 'Unknown',
+            index: index
+        }));
+    }
+    
+    setupEventListeners() {
+        // Play button
+        if (this.playButton) {
+            this.playButton.addEventListener('click', () => this.togglePlayback());
+        }
+        
+        // Volume controls
+        if (this.volumeButton) {
+            this.volumeButton.addEventListener('click', () => this.toggleMute());
+        }
+        
+        if (this.volumeSlider) {
+            this.volumeSlider.addEventListener('click', (e) => this.handleVolumeClick(e));
+        }
+        
+        // Progress bar
+        if (this.progressBar) {
+            this.progressBar.addEventListener('click', (e) => this.seekToPosition(e));
+        }
+        
+        // Audio events
+        if (this.globalAudio) {
+            this.globalAudio.addEventListener('loadedmetadata', () => this.updateDurationDisplay());
+            this.globalAudio.addEventListener('timeupdate', () => this.updateProgress());
+            this.globalAudio.addEventListener('play', () => this.onPlay());
+            this.globalAudio.addEventListener('pause', () => this.onPause());
+            this.globalAudio.addEventListener('ended', () => this.onEnded());
+        }
+        
+        // Track selection
+        this.tracks.forEach((track, index) => {
+            // Add click listener to entire song item
+            track.element.addEventListener('click', () => this.selectTrack(index));
+            
+            // Add click listener to play button
+            const playBtn = track.element.querySelector('.play-track-btn');
+            if (playBtn) {
+                playBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.selectTrack(index);
+                });
+            }
+        });
+    }
+    
+    selectTrack(index) {
+        if (index < 0 || index >= this.tracks.length) return;
+        
+        const track = this.tracks[index];
+        this.currentTrackIndex = index;
+        
+        // Stop current playback
+        if (this.globalAudio) {
+            this.globalAudio.pause();
+            this.globalAudio.currentTime = 0;
+        }
+        
+        // Load new track
+        const audioSrc = `/music-files/${track.filename}`;
+        this.globalAudio.src = audioSrc;
+        
+        // Update player display
+        this.titleDisplay.textContent = track.title;
+        this.artistDisplay.textContent = track.artist;
+        
+        // Show bottom player
+        this.bottomPlayer.style.display = 'block';
+        
+        // Enable play button
+        this.playButton.disabled = false;
+        
+        // Update track visual states
+        this.updateTrackStates();
+        
+        // Auto-play the track
+        this.globalAudio.play().catch(e => {
+            console.warn('Autoplay prevented:', e);
+        });
+    }
+    
+    updateTrackStates() {
+        this.tracks.forEach((track, index) => {
+            const playBtn = track.element.querySelector('.play-track-btn');
+            if (playBtn) {
+                if (index === this.currentTrackIndex && !this.globalAudio.paused) {
+                    playBtn.innerHTML = '<span class="play-icon">⏸</span>';
+                    track.element.classList.add('playing');
+                } else {
+                    playBtn.innerHTML = '<span class="play-icon">▶</span>';
+                    track.element.classList.remove('playing');
+                }
+            }
+        });
+    }
+    
+    togglePlayback() {
+        if (!this.globalAudio || this.currentTrackIndex === -1) return;
+        
+        if (this.globalAudio.paused) {
+            this.globalAudio.play();
+        } else {
+            this.globalAudio.pause();
+        }
+    }
+    
+    onPlay() {
+        this.playButton.classList.add('playing');
+        this.updateTrackStates();
+    }
+    
+    onPause() {
+        this.playButton.classList.remove('playing');
+        this.updateTrackStates();
+    }
+    
+    onEnded() {
+        this.playButton.classList.remove('playing');
+        this.updateTrackStates();
+        // Could implement auto-next here
+    }
+    
+    toggleMute() {
+        if (!this.globalAudio) return;
+        
+        this.globalAudio.muted = !this.globalAudio.muted;
+        this.updateVolumeButton();
+    }
+    
+    handleVolumeClick(e) {
+        const rect = this.volumeSlider.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+        const percentage = Math.max(0, Math.min(1, clickX / rect.width));
+        
+        this.setVolume(percentage);
+    }
+    
+    setVolume(volume) {
+        if (!this.globalAudio) return;
+        
+        this.globalAudio.volume = Math.max(0, Math.min(1, volume));
+        this.globalAudio.muted = false;
+        
+        // Update volume fill
+        if (this.volumeFill) {
+            this.volumeFill.style.width = `${volume * 100}%`;
+        }
+        
+        this.updateVolumeButton();
+    }
+    
+    updateVolumeButton() {
+        if (!this.volumeButton || !this.globalAudio) return;
+        
+        if (this.globalAudio.muted || this.globalAudio.volume === 0) {
+            this.volumeButton.textContent = '🔇';
+            this.volumeButton.title = 'Unmute';
+        } else {
+            this.volumeButton.textContent = '🔊';
+            this.volumeButton.title = 'Mute';
+        }
+    }
+    
+    seekToPosition(e) {
+        if (!this.globalAudio || !this.globalAudio.duration) return;
+        
+        const rect = this.progressBar.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+        const percentage = clickX / rect.width;
+        const newTime = percentage * this.globalAudio.duration;
+        
+        this.globalAudio.currentTime = Math.max(0, Math.min(this.globalAudio.duration, newTime));
+    }
+    
+    updateProgress() {
+        if (!this.globalAudio || !this.progressFill) return;
+        
+        const progress = this.globalAudio.currentTime / this.globalAudio.duration;
+        if (!isNaN(progress)) {
+            this.progressFill.style.width = `${(progress * 100).toFixed(2)}%`;
+        }
+        
+        this.updateTimeDisplay();
+    }
+    
+    updateTimeDisplay() {
+        if (this.currentTimeDisplay) {
+            this.currentTimeDisplay.textContent = this.formatTime(this.globalAudio.currentTime || 0);
+        }
+    }
+    
+    updateDurationDisplay() {
+        if (this.durationDisplay && this.globalAudio.duration) {
+            this.durationDisplay.textContent = this.formatTime(this.globalAudio.duration);
+        }
+    }
+    
+    formatTime(seconds) {
+        if (isNaN(seconds) || !isFinite(seconds)) return '0:00';
+        
+        const mins = Math.floor(seconds / 60);
+        const secs = Math.floor(seconds % 60);
+        return `${mins}:${secs.toString().padStart(2, '0')}`;
+    }
+}
+
+// Initialize Global Audio Manager on music pages
+document.addEventListener('DOMContentLoaded', function() {
+    // Check if we're on a music page
+    if (document.querySelector('.music-list-compact')) {
+        window.globalAudioManager = new GlobalAudioManager();
+    }
+});

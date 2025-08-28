@@ -69,6 +69,11 @@ module.exports = function(eleventyConfig) {
   eleventyConfig.addCollection("music", function(collectionApi) {
     return collectionApi.getFilteredByGlob("src/content/music/*.md").reverse();
   });
+
+  // Music pagination collection
+  eleventyConfig.addCollection("musicPaginated", function(collectionApi) {
+    return collectionApi.getFilteredByGlob("src/content/music/*.md").reverse();
+  });
   
   // Markdown configuration
   const markdownLibrary = markdownIt({

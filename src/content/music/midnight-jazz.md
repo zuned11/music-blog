@@ -8,7 +8,7 @@ duration: 205
 fileSize: 31250000
 filename: "midnight-jazz.flac"
 tags: ["music", "jazz", "lo-fi"]
-layout: "music"
+permalink: false
 description: "A smooth jazz-influenced piece with lo-fi aesthetics, perfect for late-night listening sessions."
 technical:
   sampleRate: 44100

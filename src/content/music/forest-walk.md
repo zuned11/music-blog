@@ -8,7 +8,7 @@ duration: 342
 fileSize: 52100000
 filename: "forest-walk.flac"
 tags: ["music", "ambient", "nature", "field-recording"]
-layout: "music"
+permalink: false
 description: "An ambient composition blending acoustic instruments with natural field recordings from forest environments."
 technical:
   sampleRate: 48000

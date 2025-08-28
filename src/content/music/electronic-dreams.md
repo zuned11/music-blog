@@ -8,7 +8,7 @@ duration: 287
 fileSize: 42570000
 filename: "electronic-dreams.flac"
 tags: ["music", "electronic", "ambient"]
-layout: "music"
+permalink: false
 description: "A dreamy electronic composition exploring digital soundscapes with layered synthesizers and ambient textures."
 technical:
   sampleRate: 44100
