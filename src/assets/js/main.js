@@ -866,6 +866,14 @@ class GlobalAudioManager {
                     this.selectTrack(index);
                 });
             }
+            
+            // Add click listener to download button to prevent bubbling
+            const downloadBtn = track.element.querySelector('.download-track-btn');
+            if (downloadBtn) {
+                downloadBtn.addEventListener('click', (e) => {
+                    e.stopPropagation(); // Prevent triggering track selection
+                });
+            }
         });
     }
     
