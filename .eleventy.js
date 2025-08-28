@@ -3,6 +3,9 @@ const markdownIt = require("markdown-it");
 const markdownItAnchor = require("markdown-it-anchor");
 const yaml = require("yaml");
 const rssPlugin = require("@11ty/eleventy-plugin-rss");
+const fs = require("fs");
+const path = require("path");
+const crypto = require("crypto");
 
 module.exports = function(eleventyConfig) {
   
@@ -59,6 +62,54 @@ module.exports = function(eleventyConfig) {
   eleventyConfig.addFilter("head", (array, limit) => {
     if (!Array.isArray(array)) return [];
     return array.slice(0, limit);
+  });
+  
+  // RSS content stability filter
+  eleventyConfig.addFilter("stableRSSDate", (collection) => {
+    if (!collection || !Array.isArray(collection) || collection.length === 0) {
+      return new Date().toUTCString();
+    }
+    
+    // Create hash of all content in collection for change detection
+    const contentHash = collection
+      .map(item => `${item.url}:${item.date}:${item.data.title}`)
+      .sort()
+      .join('|');
+    
+    const hash = crypto.createHash('md5').update(contentHash).digest('hex');
+    const cacheFile = path.join(__dirname, '.rss-cache.json');
+    
+    let cache = {};
+    try {
+      if (fs.existsSync(cacheFile)) {
+        cache = JSON.parse(fs.readFileSync(cacheFile, 'utf8'));
+      }
+    } catch (error) {
+      // If cache read fails, treat as new content
+      cache = {};
+    }
+    
+    const collectionName = collection[0]?.data?.tags?.includes('music') ? 'music' : 
+                          collection[0]?.data?.tags?.includes('blog') ? 'blog' : 'combined';
+    
+    // Check if content has changed
+    if (cache[collectionName]?.hash !== hash) {
+      // Content changed, update cache
+      cache[collectionName] = {
+        hash: hash,
+        lastUpdate: new Date().toISOString()
+      };
+      
+      try {
+        fs.writeFileSync(cacheFile, JSON.stringify(cache, null, 2));
+      } catch (error) {
+        console.warn('Warning: Could not write RSS cache file:', error.message);
+      }
+    }
+    
+    // Return the last actual content change date
+    const lastUpdate = cache[collectionName]?.lastUpdate || new Date().toISOString();
+    return DateTime.fromISO(lastUpdate).toRFC2822();
   });
   
   // Collections

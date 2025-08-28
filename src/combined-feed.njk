@@ -10,7 +10,7 @@ eleventyExcludeFromCollections: true
     <atom:link href="{{ '/feed.xml' | absoluteUrl(site.url) }}" rel="self" type="application/rss+xml"/>
     <description>{{ site.description }} - Blog posts and music releases</description>
     <language>en</language>
-    <lastBuildDate>{{ collections.combined | getNewestCollectionItemDate | dateToRfc822 }}</lastBuildDate>
+    <lastBuildDate>{{ collections.combined | stableRSSDate }}</lastBuildDate>
     
     {%- for item in collections.combined | reverse %}
     {%- if loop.index0 < 20 %}

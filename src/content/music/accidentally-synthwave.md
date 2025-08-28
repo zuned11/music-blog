@@ -2,7 +2,7 @@
 title: accidentally synthwave
 artist: zuned11
 album: just some stuff
-date: "2025"
+date: 2025-01-01
 genre:
   - edm
 duration: 64
@@ -19,6 +19,7 @@ technical:
   format: FLAC
   mimeType: audio/flac
   bitrate: 1492462
+createdDate: 2025-01-01
 ---
 
 # accidentally synthwave

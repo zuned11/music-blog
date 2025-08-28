@@ -149,11 +149,90 @@ function extractAudioMetadata(filePath) {
 }
 
 /**
+ * Parse existing markdown file to extract frontmatter
+ * @param {string} filePath - Path to existing markdown file
+ * @returns {Object|null} - Parsed frontmatter or null if file doesn't exist
+ */
+function parseExistingMarkdown(filePath) {
+    if (!fs.existsSync(filePath)) {
+        return null;
+    }
+    
+    try {
+        const content = fs.readFileSync(filePath, 'utf8');
+        const match = content.match(/^---\r?\n([\s\S]*?)\r?\n---/);
+        
+        if (!match) {
+            return null;
+        }
+        
+        return yaml.parse(match[1]);
+    } catch (error) {
+        console.warn(`Warning: Could not parse existing markdown file ${filePath}:`, error.message);
+        return null;
+    }
+}
+
+/**
+ * Check if audio file is newer than markdown file
+ * @param {string} audioPath - Path to audio file
+ * @param {string} markdownPath - Path to markdown file
+ * @returns {boolean} - Whether audio file needs processing
+ */
+function shouldUpdateFile(audioPath, markdownPath, forceUpdate = false) {
+    if (forceUpdate) {
+        return true;
+    }
+    
+    if (!fs.existsSync(markdownPath)) {
+        return true;
+    }
+    
+    const audioStats = fs.statSync(audioPath);
+    const markdownStats = fs.statSync(markdownPath);
+    
+    return audioStats.mtime > markdownStats.mtime;
+}
+
+/**
+ * Format date to ISO format (YYYY-MM-DD)
+ * @param {string|Date} dateInput - Date input
+ * @returns {string} - ISO formatted date
+ */
+function formatToISODate(dateInput) {
+    if (!dateInput) {
+        return new Date().toISOString().split('T')[0];
+    }
+    
+    // If it's already a proper ISO date, return as-is
+    if (typeof dateInput === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(dateInput)) {
+        return dateInput;
+    }
+    
+    // If it's just a year, use January 1st of that year
+    if (typeof dateInput === 'string' && /^\d{4}$/.test(dateInput)) {
+        return `${dateInput}-01-01`;
+    }
+    
+    // Try to parse as date
+    try {
+        const date = new Date(dateInput);
+        if (isNaN(date.getTime())) {
+            return new Date().toISOString().split('T')[0];
+        }
+        return date.toISOString().split('T')[0];
+    } catch (error) {
+        return new Date().toISOString().split('T')[0];
+    }
+}
+
+/**
  * Generate markdown file from metadata
  * @param {Object} metadata - Extracted metadata
  * @param {string} outputDir - Output directory for markdown file
+ * @param {boolean} forceUpdate - Force update even if file exists
  */
-function generateMarkdownFile(metadata, outputDir) {
+function generateMarkdownFile(metadata, outputDir, forceUpdate = false) {
     if (!metadata) return null;
     
     // Create slug from title
@@ -162,12 +241,32 @@ function generateMarkdownFile(metadata, outputDir) {
         .replace(/[^a-z0-9]+/g, '-')
         .replace(/^-+|-+$/g, '');
     
-    // Prepare frontmatter
+    // Ensure output directory exists
+    if (!fs.existsSync(outputDir)) {
+        fs.mkdirSync(outputDir, { recursive: true });
+    }
+    
+    const outputPath = path.join(outputDir, `${slug}.md`);
+    const audioPath = path.join(path.dirname(outputDir), '../../music-files', metadata.filename);
+    
+    // Check if file needs updating
+    if (!shouldUpdateFile(audioPath, outputPath, forceUpdate)) {
+        console.log(`Skipped (unchanged): ${outputPath}`);
+        return outputPath;
+    }
+    
+    // Parse existing markdown to preserve important fields
+    const existingData = parseExistingMarkdown(outputPath);
+    
+    // Prepare frontmatter with preservation logic
     const frontmatter = {
         title: metadata.title,
         artist: metadata.artist,
         album: metadata.album,
-        date: metadata.date,
+        // Preserve existing date if it exists and is more specific than extracted date
+        date: existingData?.date ? 
+            formatToISODate(existingData.date) : 
+            formatToISODate(metadata.date),
         genre: metadata.genre,
         duration: Math.round(metadata.duration),
         fileSize: metadata.fileSize,
@@ -184,11 +283,27 @@ function generateMarkdownFile(metadata, outputDir) {
         }
     };
     
+    // Preserve existing publication fields if they exist
+    if (existingData?.publishDate) {
+        frontmatter.publishDate = existingData.publishDate;
+    }
+    if (existingData?.createdDate) {
+        frontmatter.createdDate = existingData.createdDate;
+    }
+    
+    // If this is a new file, set creation date
+    if (!existingData) {
+        frontmatter.createdDate = frontmatter.date;
+    }
+    
     // Add optional fields if they exist
     if (metadata.composer) frontmatter.composer = metadata.composer;
     if (metadata.performer) frontmatter.performer = metadata.performer;
     if (metadata.comment) frontmatter.description = metadata.comment;
     if (metadata.description) frontmatter.description = metadata.description;
+    
+    // Preserve existing description if it exists
+    const description = existingData?.description || metadata.comment || metadata.description || 'No description available.';
     
     // Generate simplified markdown content (metadata only for centralized player)
     const yamlFrontmatter = yaml.stringify(frontmatter);
@@ -199,7 +314,7 @@ ${yamlFrontmatter}---
 
 ${metadata.artist ? `*by ${metadata.artist}*` : ''}
 
-${metadata.comment || metadata.description || 'No description available.'}
+${description}
 
 ${metadata.album !== 'Unknown Album' ? `## Album Information\n\n**Album:** ${metadata.album}` : ''}
 ${metadata.composer ? `\n**Composer:** ${metadata.composer}` : ''}
@@ -207,13 +322,7 @@ ${metadata.performer ? `\n**Performer:** ${metadata.performer}` : ''}
 
 `;
     
-    // Ensure output directory exists
-    if (!fs.existsSync(outputDir)) {
-        fs.mkdirSync(outputDir, { recursive: true });
-    }
-    
     // Write markdown file
-    const outputPath = path.join(outputDir, `${slug}.md`);
     fs.writeFileSync(outputPath, content);
     
     console.log(`Generated: ${outputPath}`);
@@ -242,8 +351,11 @@ function formatFileSize(bytes) {
 /**
  * Process a single audio file or all supported audio files in a directory
  * Supports: FLAC, MP3, WAV, AIF/AIFF, OGG, M4A, AAC
+ * @param {string} inputPath - Path to audio file or directory
+ * @param {string} outputDir - Output directory for markdown files
+ * @param {boolean} forceUpdate - Force update even if files exist
  */
-function processFiles(inputPath, outputDir) {
+function processFiles(inputPath, outputDir, forceUpdate = false) {
     const musicContentDir = outputDir || path.join(__dirname, '../src/content/music');
     
     if (fs.statSync(inputPath).isDirectory()) {
@@ -257,7 +369,7 @@ function processFiles(inputPath, outputDir) {
         files.forEach(filePath => {
             console.log(`Processing: ${path.basename(filePath)}`);
             const metadata = extractAudioMetadata(filePath);
-            generateMarkdownFile(metadata, musicContentDir);
+            generateMarkdownFile(metadata, musicContentDir, forceUpdate);
         });
     } else {
         // Process single file
@@ -269,26 +381,38 @@ function processFiles(inputPath, outputDir) {
         
         console.log(`Processing: ${path.basename(inputPath)}`);
         const metadata = extractAudioMetadata(inputPath);
-        generateMarkdownFile(metadata, musicContentDir);
+        generateMarkdownFile(metadata, musicContentDir, forceUpdate);
     }
 }
 
 // CLI usage
 if (require.main === module) {
-    const inputPath = process.argv[2];
-    const outputDir = process.argv[3];
+    const args = process.argv.slice(2);
+    const forceUpdate = args.includes('--force') || args.includes('-f');
+    const inputPath = args.find(arg => !arg.startsWith('-'));
+    const outputDirArg = args[args.indexOf(inputPath) + 1];
+    const outputDir = outputDirArg && !outputDirArg.startsWith('-') ? outputDirArg : undefined;
     
-    if (!inputPath) {
-        console.log('Usage: node extract-metadata.js <audio-file-or-directory> [output-directory]');
+    if (!inputPath || args.includes('--help') || args.includes('-h')) {
+        console.log('Usage: node extract-metadata.js <audio-file-or-directory> [output-directory] [options]');
+        console.log('');
+        console.log('Options:');
+        console.log('  --force, -f    Force update even if files exist and are up to date');
+        console.log('  --help, -h     Show this help message');
         console.log('');
         console.log('Supported formats: FLAC, MP3, WAV, AIF/AIFF, OGG, M4A, AAC');
         console.log('');
         console.log('Examples:');
         console.log('  node extract-metadata.js song.flac');
-        console.log('  node extract-metadata.js song.mp3');
+        console.log('  node extract-metadata.js song.mp3 --force');
         console.log('  node extract-metadata.js ./music-files/');
-        console.log('  node extract-metadata.js song.wav ./src/content/music/');
-        process.exit(1);
+        console.log('  node extract-metadata.js song.wav ./src/content/music/ --force');
+        console.log('');
+        console.log('Date Preservation:');
+        console.log('  - Existing publication dates are preserved by default');
+        console.log('  - Files are only updated if audio file is newer than markdown');
+        console.log('  - Use --force to regenerate all files regardless');
+        process.exit(inputPath ? 0 : 1);
     }
     
     if (!fs.existsSync(inputPath)) {
@@ -296,7 +420,13 @@ if (require.main === module) {
         process.exit(1);
     }
     
-    processFiles(inputPath, outputDir);
+    if (forceUpdate) {
+        console.log('Force update enabled - will regenerate all files');
+    } else {
+        console.log('Preservation mode - will skip unchanged files and preserve existing dates');
+    }
+    
+    processFiles(inputPath, outputDir, forceUpdate);
     console.log('Processing complete!');
 }
 
@@ -306,5 +436,8 @@ module.exports = {
     generateMarkdownFile,
     processFiles,
     isSupportedAudioFile,
+    parseExistingMarkdown,
+    shouldUpdateFile,
+    formatToISODate,
     SUPPORTED_FORMATS
 };
