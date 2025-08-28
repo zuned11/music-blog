@@ -837,6 +837,7 @@ class GlobalAudioManager {
         
         if (this.volumeSlider) {
             this.volumeSlider.addEventListener('click', (e) => this.handleVolumeClick(e));
+            this.volumeSlider.addEventListener('mousedown', (e) => this.handleVolumeMouseDown(e));
         }
         
         // Progress bar
@@ -961,6 +962,35 @@ class GlobalAudioManager {
     }
     
     handleVolumeClick(e) {
+        const rect = this.volumeSlider.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+        const percentage = Math.max(0, Math.min(1, clickX / rect.width));
+        
+        this.setVolume(percentage);
+    }
+    
+    handleVolumeMouseDown(e) {
+        e.preventDefault();
+        this.isDraggingVolume = true;
+        
+        // Handle initial click
+        this.handleVolumeClick(e);
+        
+        // Add document-level event listeners for dragging
+        const handleMouseMove = (e) => this.handleVolumeDrag(e);
+        const handleMouseUp = () => {
+            this.isDraggingVolume = false;
+            document.removeEventListener('mousemove', handleMouseMove);
+            document.removeEventListener('mouseup', handleMouseUp);
+        };
+        
+        document.addEventListener('mousemove', handleMouseMove);
+        document.addEventListener('mouseup', handleMouseUp);
+    }
+    
+    handleVolumeDrag(e) {
+        if (!this.isDraggingVolume) return;
+        
         const rect = this.volumeSlider.getBoundingClientRect();
         const clickX = e.clientX - rect.left;
         const percentage = Math.max(0, Math.min(1, clickX / rect.width));
