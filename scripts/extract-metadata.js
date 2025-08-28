@@ -4,6 +4,7 @@ const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 const yaml = require('yaml');
+const crypto = require('crypto');
 
 /**
  * Supported audio formats and their extensions
@@ -81,6 +82,53 @@ function isSupportedAudioFile(filePath) {
 }
 
 /**
+ * Generate waveform image for audio file using ffmpeg
+ * @param {string} audioPath - Path to audio file
+ * @param {string} outputPath - Path for output waveform PNG
+ * @param {Object} options - Waveform generation options
+ * @returns {boolean} - Whether waveform was generated successfully
+ */
+function generateWaveform(audioPath, outputPath, options = {}) {
+    try {
+        const width = options.width || 800;
+        const height = options.height || 200;
+        const colors = options.colors || 'white';
+        
+        // Generate unique filename hash to prevent collisions
+        const fileHash = crypto.createHash('md5').update(audioPath).digest('hex').substring(0, 8);
+        const tempOutput = outputPath.replace('.png', `_${fileHash}.png`);
+        
+        // Use ffmpeg to generate waveform image
+        const command = `ffmpeg -i "${audioPath}" -filter_complex "showwavespic=s=${width}x${height}:colors=${colors}" -frames:v 1 -y "${tempOutput}"`;
+        
+        console.log(`Generating waveform: ${path.basename(audioPath)} -> ${path.basename(tempOutput)}`);
+        execSync(command, { stdio: 'ignore' });
+        
+        // Move to final location if different
+        if (tempOutput !== outputPath) {
+            fs.renameSync(tempOutput, outputPath);
+        }
+        
+        return true;
+    } catch (error) {
+        console.error(`Failed to generate waveform for ${audioPath}:`, error.message);
+        return false;
+    }
+}
+
+/**
+ * Get waveform file path for audio file
+ * @param {string} audioPath - Path to audio file
+ * @param {string} outputDir - Directory for waveform files
+ * @returns {string} - Path where waveform should be stored
+ */
+function getWaveformPath(audioPath, outputDir = 'public/waveforms') {
+    const basename = path.basename(audioPath, path.extname(audioPath));
+    const safeBasename = basename.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-');
+    return path.join(outputDir, `${safeBasename}.png`);
+}
+
+/**
  * Extract metadata from audio file using ffprobe
  * Supports: FLAC, MP3, WAV, AIF/AIFF, OGG, M4A, AAC
  * @param {string} filePath - Path to audio file
@@ -108,6 +156,19 @@ function extractAudioMetadata(filePath) {
             normalizedTags[key.toLowerCase()] = value;
         });
         
+        // Generate waveform if it doesn't exist
+        const waveformPath = getWaveformPath(filePath);
+        const waveformRelativePath = path.relative('public', waveformPath);
+        let hasWaveform = false;
+        
+        if (!fs.existsSync(waveformPath)) {
+            console.log(`Generating waveform for: ${path.basename(filePath)}`);
+            fs.mkdirSync(path.dirname(waveformPath), { recursive: true });
+            hasWaveform = generateWaveform(filePath, waveformPath);
+        } else {
+            hasWaveform = true;
+        }
+        
         return {
             // File information
             filename: path.basename(filePath),
@@ -124,6 +185,10 @@ function extractAudioMetadata(filePath) {
             sampleRate: parseInt(stream.sample_rate) || 0,
             channels: stream.channels || 2,
             bitDepth: stream.bits_per_sample || (formatName === 'MP3' ? null : 16),
+            
+            // Waveform information
+            waveform: hasWaveform ? `/${waveformRelativePath}` : null,
+            hasWaveform: hasWaveform,
             
             // Metadata tags
             title: normalizedTags.title || path.basename(filePath, ext),
@@ -280,6 +345,10 @@ function generateMarkdownFile(metadata, outputDir, forceUpdate = false) {
             format: metadata.format,
             mimeType: metadata.mimeType,
             bitrate: metadata.bitrate
+        },
+        waveform: {
+            enabled: metadata.hasWaveform,
+            path: metadata.waveform
         }
     };
     

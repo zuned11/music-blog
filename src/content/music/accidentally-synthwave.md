@@ -1,4 +1,5 @@
 ---
+layout: music
 title: accidentally synthwave
 artist: zuned11
 album: just some stuff
@@ -11,7 +12,7 @@ filename: accidentally synthwave.flac
 tags:
   - music
   - edm
-permalink: false
+permalink: "/music/{{ title | slugify }}/"
 technical:
   sampleRate: 44100
   bitDepth: 16
@@ -19,6 +20,9 @@ technical:
   format: FLAC
   mimeType: audio/flac
   bitrate: 1492462
+waveform:
+  enabled: true
+  path: /waveforms/accidentally-synthwave.png
 createdDate: 2025-01-01
 ---
 

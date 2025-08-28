@@ -19,6 +19,11 @@ dist/
 music-files/*.flac
 music-files/*.wav
 music-files/*.mp3
+music-files/*.ogg
+music-files/*.aif
+music-files/*.aiff
+music-files/*.m4a
+music-files/*.aac
 
 # Keep music-files directory structure but ignore audio files
 !music-files/.gitkeep

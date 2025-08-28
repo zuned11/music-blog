@@ -55,14 +55,22 @@ layout: base
                 <div class="track-title">{{ title }}</div>
                 <div class="track-artist">{{ artist }}</div>
                 <div class="waveform-container">
-                    {% if waveform %}
-                    <div class="waveform" data-waveform="{{ waveform | dump }}"></div>
-                    {% else %}
-                    <div class="waveform-placeholder"></div>
-                    {% endif %}
-                    <div class="progress-bar">
-                        <div class="progress-fill"></div>
+                    {% if waveform.enabled and waveform.path %}
+                    <div class="waveform" data-waveform-path="{{ waveform.path }}">
+                        <img src="{{ waveform.path }}" alt="Waveform for {{ title }}" class="waveform-image">
+                        <div class="waveform-overlay">
+                            <div class="progress-bar">
+                                <div class="progress-fill"></div>
+                            </div>
+                        </div>
                     </div>
+                    {% else %}
+                    <div class="waveform-placeholder">
+                        <div class="progress-bar">
+                            <div class="progress-fill"></div>
+                        </div>
+                    </div>
+                    {% endif %}
                 </div>
                 <div class="time-display">
                     <span class="current-time">0:00</span>

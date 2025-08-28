@@ -639,6 +639,28 @@ class AudioPlayerInstance {
             });
         }
         
+        // Connect waveform interaction
+        this.waveform = this.container.querySelector('.waveform');
+        this.waveformContainer = this.container.querySelector('.waveform-container');
+        if (this.waveformContainer) {
+            this.waveformContainer.addEventListener('click', (e) => {
+                this.seekToPosition(e);
+            });
+            
+            // Add hover effect for waveform
+            this.waveformContainer.addEventListener('mouseenter', () => {
+                if (this.waveform) {
+                    this.waveform.style.opacity = '0.8';
+                }
+            });
+            
+            this.waveformContainer.addEventListener('mouseleave', () => {
+                if (this.waveform) {
+                    this.waveform.style.opacity = '0.6';
+                }
+            });
+        }
+        
         // Add loading state handling
         this.audio.addEventListener('loadstart', () => {
             this.container.classList.add('loading');

@@ -26,7 +26,8 @@
       "Bash(npm test:*)",
       "Bash(npx jest:*)",
       "Bash(npm install:*)",
-      "Bash(npx @11ty/eleventy:*)"
+      "Bash(npx @11ty/eleventy:*)",
+      "Bash(ffprobe:*)"
     ],
     "deny": [],
     "ask": []
