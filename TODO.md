@@ -8,6 +8,9 @@
 - ✅ Fixed download button triggering play functionality
 - ✅ Updated Music page headers to use eggshell-white color
 - ✅ Fixed volume slider to support real-time dragging
+- ✅ **URGENT: Site-wide music playback** - Moved player to base template for cross-page persistence
+- ✅ **URGENT: Play button only control** - Removed click-anywhere-to-play behavior
+- ✅ **URGENT: Demo song removal** - Removed "accidentally synthwave" demo track
 
 ## ⏳ Outstanding Items
 

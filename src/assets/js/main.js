@@ -854,12 +854,9 @@ class GlobalAudioManager {
             this.globalAudio.addEventListener('ended', () => this.onEnded());
         }
         
-        // Track selection
+        // Track selection - only via play button
         this.tracks.forEach((track, index) => {
-            // Add click listener to entire song item
-            track.element.addEventListener('click', () => this.selectTrack(index));
-            
-            // Add click listener to play button
+            // Add click listener to play button only
             const playBtn = track.element.querySelector('.play-track-btn');
             if (playBtn) {
                 playBtn.addEventListener('click', (e) => {
@@ -1067,10 +1064,8 @@ class GlobalAudioManager {
     }
 }
 
-// Initialize Global Audio Manager on music pages
+// Initialize Global Audio Manager on all pages
 document.addEventListener('DOMContentLoaded', function() {
-    // Check if we're on a music page
-    if (document.querySelector('.music-list-compact')) {
-        window.globalAudioManager = new GlobalAudioManager();
-    }
+    // Always initialize the global audio manager since player is now in base template
+    window.globalAudioManager = new GlobalAudioManager();
 });

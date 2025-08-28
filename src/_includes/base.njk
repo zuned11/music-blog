@@ -189,6 +189,56 @@
         <p>&copy; 2024 zuned11. All rights reserved.</p>
     </footer>
 
+    <!-- Fixed Bottom Audio Player -->
+    <div id="bottom-player" class="bottom-player" style="display: none;">
+        <!-- Hidden HTML5 audio element -->
+        <audio id="global-audio" preload="metadata" class="global-audio-player">
+            <p>Your browser doesn't support HTML5 audio.</p>
+        </audio>
+
+        <div class="player-content">
+            <!-- Track Info -->
+            <div class="player-track-info">
+                <div class="player-thumbnail">
+                    <div class="album-art-placeholder">
+                        <div class="music-icon">♪</div>
+                    </div>
+                </div>
+                <div class="player-details">
+                    <div class="player-title">No track selected</div>
+                    <div class="player-artist">Select a track to play</div>
+                </div>
+            </div>
+
+            <!-- Controls -->
+            <div class="player-controls">
+                <button id="global-play-button" class="player-play-button" title="Play/Pause" disabled>
+                    <span class="play-icon">▶</span>
+                    <span class="pause-icon">⏸</span>
+                </button>
+                <div class="player-volume-control">
+                    <button class="player-volume-button" title="Toggle Mute">🔊</button>
+                    <div class="player-volume-slider" data-volume="0.8">
+                        <div class="player-volume-fill"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Progress and Time -->
+            <div class="player-progress-section">
+                <div class="player-waveform-container">
+                    <div class="player-progress-bar">
+                        <div class="player-progress-fill"></div>
+                    </div>
+                </div>
+                <div class="player-time-display">
+                    <span class="player-current-time">0:00</span>
+                    <span class="player-duration">0:00</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://unpkg.com/lunr@2.3.9/lunr.min.js"></script>
     <script src="/assets/js/main.js"></script>
 </body>
