@@ -1,5 +1,4 @@
 ---
-layout: music
 title: accidentally synthwave
 artist: zuned11
 album: just some stuff
@@ -12,6 +11,7 @@ filename: accidentally synthwave.flac
 tags:
   - music
   - edm
+layout: music
 permalink: "/music/{{ title | slugify }}/"
 technical:
   sampleRate: 44100

@@ -837,13 +837,24 @@ class GlobalAudioManager {
     
     collectTracks() {
         const songItems = document.querySelectorAll('.song-item[data-filename]');
-        this.tracks = Array.from(songItems).map((item, index) => ({
-            element: item,
-            filename: item.dataset.filename,
-            title: item.querySelector('.song-title')?.textContent || 'Unknown',
-            artist: item.querySelector('.song-artist')?.textContent || 'Unknown',
-            index: index
-        }));
+        this.tracks = Array.from(songItems).map((item, index) => {
+            const track = {
+                element: item,
+                filename: item.dataset.filename,
+                title: item.querySelector('.song-title')?.textContent || 'Unknown',
+                artist: item.querySelector('.song-artist')?.textContent || 'Unknown',
+                index: index,
+                miniWaveform: item.querySelector('.mini-waveform'),
+                miniProgressFill: item.querySelector('.mini-progress-fill')
+            };
+            
+            // Add click handler to mini-waveform for seek functionality
+            if (track.miniWaveform) {
+                track.miniWaveform.addEventListener('click', (e) => this.handleWaveformClick(e, index));
+            }
+            
+            return track;
+        });
     }
     
     setupEventListeners() {
@@ -1063,6 +1074,7 @@ class GlobalAudioManager {
         }
         
         this.updateTimeDisplay();
+        this.updateMiniWaveformProgress();
     }
     
     updateTimeDisplay() {
@@ -1075,6 +1087,37 @@ class GlobalAudioManager {
         if (this.durationDisplay && this.globalAudio.duration) {
             this.durationDisplay.textContent = this.formatTime(this.globalAudio.duration);
         }
+    }
+    
+    handleWaveformClick(event, trackIndex) {
+        // Load and play this track if not already loaded
+        if (this.currentTrackIndex !== trackIndex) {
+            this.loadTrack(trackIndex);
+        }
+        
+        // Calculate seek position based on click position
+        const waveform = event.currentTarget;
+        const rect = waveform.getBoundingClientRect();
+        const clickX = event.clientX - rect.left;
+        const percentage = Math.max(0, Math.min(1, clickX / rect.width));
+        
+        if (this.globalAudio && this.globalAudio.duration) {
+            const seekTime = percentage * this.globalAudio.duration;
+            this.globalAudio.currentTime = seekTime;
+        }
+    }
+    
+    updateMiniWaveformProgress() {
+        if (this.currentTrackIndex === -1 || !this.globalAudio) return;
+        
+        const currentTrack = this.tracks[this.currentTrackIndex];
+        if (!currentTrack || !currentTrack.miniProgressFill) return;
+        
+        const duration = this.globalAudio.duration || 0;
+        const currentTime = this.globalAudio.currentTime || 0;
+        const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
+        
+        currentTrack.miniProgressFill.style.width = `${progress}%`;
     }
     
     formatTime(seconds) {

@@ -1366,6 +1366,11 @@ a:hover {
         position: static;
     }
     
+    /* Show full-size mini-waveforms on large desktop */
+    .song-waveform {
+        display: block;
+    }
+    
     .sidebar-toggle {
         display: none;
     }
@@ -1403,6 +1408,11 @@ a:hover {
         z-index: 1000;
     }
     
+    /* Show full-size mini-waveforms on desktop */
+    .song-waveform {
+        display: block;
+    }
+    
     .sidebar-toggle .toggle-text {
         opacity: 1;
     }
@@ -1425,6 +1435,13 @@ a:hover {
         position: absolute;
         height: 100vh;
         z-index: 1000;
+    }
+    
+    /* Show smaller waveforms on tablet */
+    .song-waveform {
+        display: block;
+        flex: 0 0 300px;
+        height: 45px;
     }
     
     .sidebar-toggle .toggle-text {
@@ -1627,6 +1644,75 @@ a:hover {
     display: flex;
     align-items: center;
     gap: 1rem;
+}
+
+/* Responsive Mini-Waveform Styles */
+.song-waveform {
+    flex: 0 0 400px;
+    height: 60px;
+    display: none; /* Hidden by default, shown on larger screens */
+}
+
+.mini-waveform {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    background-color: var(--navy-darker);
+    transition: opacity 0.3s ease;
+}
+
+.mini-waveform:hover {
+    opacity: 0.8;
+}
+
+.mini-waveform-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: invert(1) contrast(2);
+    opacity: 0.6;
+}
+
+.mini-waveform-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, var(--purple-accent) 0%, var(--teal-accent) 100%);
+    mix-blend-mode: multiply;
+    opacity: 0.3;
+    pointer-events: none;
+}
+
+.mini-progress-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: transparent;
+    cursor: pointer;
+}
+
+.mini-progress-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, rgba(167, 139, 250, 0.8) 0%, rgba(6, 182, 212, 0.8) 100%);
+    transition: width 0.1s ease;
+    pointer-events: none;
+}
+
+/* Playing state for mini-waveform */
+.song-item.playing .mini-waveform-overlay {
+    opacity: 0.5;
+}
+
+.song-item.playing .mini-waveform-image {
+    opacity: 0.8;
 }
 
 .genre-tags-compact {

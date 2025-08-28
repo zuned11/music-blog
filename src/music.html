@@ -25,7 +25,13 @@ permalink: "/music/{% if pagination.pageNumber > 0 %}{{ pagination.pageNumber + 
     <article class="song-item" data-filename="{{ track.data.filename }}" data-track-index="{{ loop.index0 }}">
         <div class="song-info">
             <div class="song-primary">
-                <h3 class="song-title">{{ track.data.title }}</h3>
+                <h3 class="song-title">
+                    {% if track.page.url %}
+                    <a href="{{ track.page.url }}">{{ track.data.title }}</a>
+                    {% else %}
+                    {{ track.data.title }}
+                    {% endif %}
+                </h3>
                 <span class="song-artist">{{ track.data.artist }}</span>
             </div>
             <div class="song-secondary">
@@ -37,6 +43,21 @@ permalink: "/music/{% if pagination.pageNumber > 0 %}{{ pagination.pageNumber + 
                 {% endif %}
             </div>
         </div>
+        
+        <!-- Responsive Waveform Section -->
+        {% if track.data.waveform and track.data.waveform.enabled %}
+        <div class="song-waveform" data-filename="{{ track.data.filename }}">
+            <div class="mini-waveform" data-waveform-path="{{ track.data.waveform.path }}">
+                <img src="{{ track.data.waveform.path }}" alt="Waveform for {{ track.data.title }}" class="mini-waveform-image">
+                <div class="mini-waveform-overlay">
+                    <div class="mini-progress-bar">
+                        <div class="mini-progress-fill"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
         <div class="song-metadata">
             {% if track.data.fileSize %}
             <span class="file-size">{{ track.data.fileSize | formatFileSize }}</span>
