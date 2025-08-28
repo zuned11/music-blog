@@ -18,26 +18,68 @@ layout: base
     </header>
 
     {% if filename %}
-    <div class="music-player">
-        <div class="music-controls">
-            <audio controls preload="metadata" class="music-audio-player" data-filename="{{ filename }}">
-                <source src="/music-files/{{ filename }}" type="{{ technical.mimeType or 'audio/mpeg' }}">
-                {% comment %}
-                Future: Add multiple source formats for better browser compatibility
-                <source src="/music-files/{{ filename | replace: technical.format | lower, 'mp3' }}" type="audio/mpeg">
-                <source src="/music-files/{{ filename | replace: technical.format | lower, 'ogg' }}" type="audio/ogg">
-                {% endcomment %}
-                <p>Your browser doesn't support HTML5 audio. <a href="/music-files/{{ filename }}" download>Download the track</a> instead.</p>
-            </audio>
+    <div class="music-player" data-filename="{{ filename }}">
+        <!-- Hidden HTML5 audio element for playback -->
+        <audio preload="metadata" class="music-audio-player" data-filename="{{ filename }}">
+            <source src="/music-files/{{ filename }}" type="{{ technical.mimeType or 'audio/mpeg' }}">
+            <p>Your browser doesn't support HTML5 audio. <a href="/music-files/{{ filename }}" download>Download the track</a> instead.</p>
+        </audio>
+
+        <!-- 3-Column Card Layout -->
+        <div class="music-card">
+            <!-- Column 1: Album Thumbnail -->
+            <div class="music-thumbnail">
+                {% if albumArt %}
+                <img src="{{ albumArt }}" alt="Album art for {{ title }}" class="album-art">
+                {% else %}
+                <div class="album-art-placeholder">
+                    <div class="music-icon">♪</div>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Column 2: Play Controls -->
+            <div class="music-controls">
+                <button class="play-button" data-filename="{{ filename }}" title="Play/Pause">
+                    <span class="play-icon">▶</span>
+                    <span class="pause-icon">⏸</span>
+                </button>
+                <div class="volume-control">
+                    <button class="volume-button" title="Toggle Mute">🔊</button>
+                    <input type="range" class="volume-slider" min="0" max="1" step="0.05" value="0.8">
+                </div>
+            </div>
+
+            <!-- Column 3: Track Info and Waveform -->
+            <div class="music-info">
+                <div class="track-title">{{ title }}</div>
+                <div class="track-artist">{{ artist }}</div>
+                <div class="waveform-container">
+                    {% if waveform %}
+                    <div class="waveform" data-waveform="{{ waveform | dump }}"></div>
+                    {% else %}
+                    <div class="waveform-placeholder"></div>
+                    {% endif %}
+                    <div class="progress-bar">
+                        <div class="progress-fill"></div>
+                    </div>
+                </div>
+                <div class="time-display">
+                    <span class="current-time">0:00</span>
+                    <span class="duration">{{ duration | formatDuration or "--:--" }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Download Link -->
+        <div class="music-download">
             <a href="/music-files/{{ filename }}" class="download-link" download>
                 Download {{ technical.format or "Audio" }}
                 {% if fileSize %}({{ fileSize | formatFileSize }}){% endif %}
             </a>
-        </div>
-        <div class="music-info">
-            {% if duration %}<div><strong>Duration:</strong> {{ duration | formatDuration }}</div>{% endif %}
-            {% if genre %}<div><strong>Genre:</strong> {{ genre | join(", ") }}</div>{% endif %}
-            {% if technical %}<div><strong>Quality:</strong> {{ technical.sampleRate / 1000 }}kHz / {{ technical.bitDepth }}bit</div>{% endif %}
+            {% if duration %}<span class="quality-info">{{ duration | formatDuration }} • {% endif %}
+            {% if technical %}{{ technical.sampleRate / 1000 }}kHz / {{ technical.bitDepth }}bit{% endif %}
+            {% if duration %}</span>{% endif %}
         </div>
     </div>
     {% endif %}

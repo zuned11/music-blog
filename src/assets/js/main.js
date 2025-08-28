@@ -598,6 +598,47 @@ class AudioPlayerInstance {
     enhancePlayerUI() {
         if (!this.container) return;
         
+        // Find UI elements
+        this.playButton = this.container.querySelector('.play-button');
+        this.volumeButton = this.container.querySelector('.volume-button');
+        this.volumeSlider = this.container.querySelector('.volume-slider');
+        this.progressBar = this.container.querySelector('.progress-bar');
+        this.progressFill = this.container.querySelector('.progress-fill');
+        this.currentTimeDisplay = this.container.querySelector('.current-time');
+        this.durationDisplay = this.container.querySelector('.duration');
+        
+        // Connect play button
+        if (this.playButton) {
+            this.playButton.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.togglePlayPause();
+            });
+        }
+        
+        // Connect volume controls
+        if (this.volumeButton) {
+            this.volumeButton.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.toggleMute();
+            });
+        }
+        
+        if (this.volumeSlider) {
+            this.volumeSlider.addEventListener('input', (e) => {
+                this.setVolume(parseFloat(e.target.value));
+            });
+            
+            // Set initial volume
+            this.setVolume(parseFloat(this.volumeSlider.value));
+        }
+        
+        // Connect progress bar
+        if (this.progressBar) {
+            this.progressBar.addEventListener('click', (e) => {
+                this.seekToPosition(e);
+            });
+        }
+        
         // Add loading state handling
         this.audio.addEventListener('loadstart', () => {
             this.container.classList.add('loading');
@@ -605,21 +646,117 @@ class AudioPlayerInstance {
         
         this.audio.addEventListener('canplay', () => {
             this.container.classList.remove('loading');
+            this.updateDurationDisplay();
         });
         
-        // Add time updates for future progress display
+        // Add time updates for progress display
         this.audio.addEventListener('timeupdate', () => {
-            if (this.isActive) {
-                this.updateProgress();
-            }
+            this.updateProgress();
+            this.updateTimeDisplay();
+        });
+        
+        // Update button state when audio state changes
+        this.audio.addEventListener('play', () => {
+            this.updatePlayButtonState(true);
+        });
+        
+        this.audio.addEventListener('pause', () => {
+            this.updatePlayButtonState(false);
+        });
+        
+        this.audio.addEventListener('ended', () => {
+            this.updatePlayButtonState(false);
         });
     }
     
+    togglePlayPause() {
+        if (this.audio.paused) {
+            this.play();
+        } else {
+            this.pause();
+        }
+    }
+    
+    updatePlayButtonState(isPlaying) {
+        if (!this.playButton) return;
+        
+        if (isPlaying) {
+            this.playButton.classList.add('playing');
+        } else {
+            this.playButton.classList.remove('playing');
+        }
+    }
+    
+    toggleMute() {
+        if (this.audio.muted) {
+            this.audio.muted = false;
+            this.updateVolumeButton(false);
+            if (this.volumeSlider) {
+                this.audio.volume = parseFloat(this.volumeSlider.value);
+            }
+        } else {
+            this.audio.muted = true;
+            this.updateVolumeButton(true);
+        }
+    }
+    
+    updateVolumeButton(isMuted) {
+        if (!this.volumeButton) return;
+        
+        if (isMuted) {
+            this.volumeButton.textContent = '🔇';
+            this.volumeButton.title = 'Unmute';
+        } else {
+            this.volumeButton.textContent = '🔊';
+            this.volumeButton.title = 'Mute';
+        }
+    }
+    
+    setVolume(volume) {
+        this.audio.volume = Math.max(0, Math.min(1, volume));
+        this.audio.muted = false;
+        this.updateVolumeButton(false);
+    }
+    
+    seekToPosition(e) {
+        if (!this.audio.duration) return;
+        
+        const rect = this.progressBar.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+        const percentage = clickX / rect.width;
+        const newTime = percentage * this.audio.duration;
+        
+        this.audio.currentTime = Math.max(0, Math.min(this.audio.duration, newTime));
+    }
+    
     updateProgress() {
-        // Future: Update custom progress bar
         const progress = this.audio.currentTime / this.audio.duration;
-        // Store for future waveform/progress bar implementation
         this.lastProgress = progress || 0;
+        
+        // Update visual progress bar
+        if (this.progressFill && !isNaN(progress)) {
+            this.progressFill.style.width = `${Math.round(progress * 100)}%`;
+        }
+    }
+    
+    updateTimeDisplay() {
+        if (this.currentTimeDisplay) {
+            this.currentTimeDisplay.textContent = this.formatTime(this.audio.currentTime || 0);
+        }
+    }
+    
+    updateDurationDisplay() {
+        if (this.durationDisplay && this.audio.duration) {
+            this.durationDisplay.textContent = this.formatTime(this.audio.duration);
+        }
+    }
+    
+    formatTime(seconds) {
+        if (isNaN(seconds) || !isFinite(seconds)) return '0:00';
+        
+        const mins = Math.floor(seconds / 60);
+        const secs = Math.floor(seconds % 60);
+        return `${mins}:${secs.toString().padStart(2, '0')}`;
     }
     
     getCurrentTime() {
