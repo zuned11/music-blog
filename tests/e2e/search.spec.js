@@ -38,13 +38,13 @@ test.describe('Search functionality', () => {
     const searchResults = page.locator('#search-results');
 
     // Search for music-related content
-    await searchInput.fill('electronic');
+    await searchInput.fill('synthwave');
     await page.waitForTimeout(500); // Wait for debounced search
 
     // Check that results appear
     await expect(searchResults).toBeVisible();
     const results = page.locator('.search-result');
-    await expect(results.first().locator('.search-result-title')).toContainText('Electronic Dreams');
+    await expect(results.first().locator('.search-result-title')).toContainText('accidentally synthwave');
     await expect(results.first().locator('.search-result-type')).toContainText('music');
     await expect(results.first().locator('.search-result-artist')).toContainText('by zuned11');
   });
@@ -52,13 +52,13 @@ test.describe('Search functionality', () => {
   test('search highlights matching terms', async ({ page }) => {
     const searchInput = page.locator('#search-input');
     
-    await searchInput.fill('jazz');
+    await searchInput.fill('synthwave');
     await page.waitForTimeout(500);
 
     // Check for highlighted search terms
     const highlightedTerm = page.locator('.search-results mark');
     await expect(highlightedTerm).toBeVisible();
-    await expect(highlightedTerm).toContainText('jazz');
+    await expect(highlightedTerm).toContainText('synthwave');
   });
 
   test('search shows no results message for non-existent terms', async ({ page }) => {
@@ -75,15 +75,15 @@ test.describe('Search functionality', () => {
   test('search results can be clicked to navigate', async ({ page }) => {
     const searchInput = page.locator('#search-input');
     
-    await searchInput.fill('electronic');
+    await searchInput.fill('synthwave');
     await page.waitForTimeout(500);
 
     const firstResult = page.locator('.search-result-link').first();
     await firstResult.click();
 
-    // Should navigate to the music track page
-    await expect(page).toHaveURL(/.*electronic-dreams.*/);
-    await expect(page.locator('h1')).toContainText('Electronic Dreams');
+    // Should navigate to the music page since individual track pages are disabled
+    await expect(page).toHaveURL(/.*music.*/);
+    await expect(page.locator('h1')).toContainText('Music');
   });
 
   test('search results hide when clicking outside', async ({ page }) => {
